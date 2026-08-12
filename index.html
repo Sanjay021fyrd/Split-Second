@@ -1,917 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-    <title>Reaction Master — Luxury Edition</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaction Master V6</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="app-shell">
+<main class="game-container">
 
-    <!-- =====================================
-         TOP NAVIGATION
-    ====================================== -->
-
-    <header class="topbar">
-
+    <header class="game-header">
         <div class="brand">
-
-            <div class="brand-mark">
-                RM
+            <div class="brand-icon">⚡</div>
+            <div>
+                <h1>Reaction Master</h1>
+                <p>Competitive Reflex Challenge</p>
             </div>
-
-            <div class="brand-text">
-
-                <div class="brand-name">
-                    REACTION MASTER
-                </div>
-
-                <div class="brand-edition">
-                    LUXURY EDITION
-                </div>
-
-            </div>
-
         </div>
 
-
-        <div class="top-actions">
-
-            <div class="live-pill">
-                <span class="live-dot"></span>
-                SYSTEM ONLINE
-            </div>
-
-            <button
-                id="sound-btn"
-                class="icon-button"
-                type="button">
-
-                🔊
-
-            </button>
-
+        <div class="live-status">
+            <span class="status-dot"></span>
+            LIVE
         </div>
-
     </header>
 
+    <section class="hud">
+        <div class="hud-card">
+            <span>ROUND</span>
+            <strong id="round">0 / 5</strong>
+        </div>
 
-    <!-- =====================================
-         MAIN CONTENT
-    ====================================== -->
+        <div class="hud-card">
+            <span>COMBO</span>
+            <strong id="combo">0x</strong>
+        </div>
 
-    <main class="dashboard">
+        <div class="hud-card">
+            <span>BEST</span>
+            <strong id="best-score">--</strong>
+        </div>
+    </section>
 
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
 
-        <!-- HERO -->
+    <section id="game-area" class="game-area">
 
-        <section class="hero">
+        <div class="game-content">
 
-            <div class="eyebrow">
-                REFLEX PERFORMANCE SYSTEM
+            <div id="countdown" class="countdown"></div>
+
+            <div id="message" class="message">
+                READY?
             </div>
 
-            <h1>
-                Master your
-                <span>reaction.</span>
-            </h1>
-
-            <p>
-                Precision. Speed. Consistency.
-                Test your reflexes and build your record.
+            <p id="sub-message" class="sub-message">
+                Test your reflexes
             </p>
 
-        </section>
-<!-- =========================================
-     V9.3 DIFFICULTY
-========================================= -->
-
-<section class="difficulty-panel">
-
-    <div class="difficulty-header">
-        <div>
-            <span class="section-label">CHALLENGE</span>
-            <h2>Difficulty</h2>
-        </div>
-
-        <span id="difficulty-label">NORMAL</span>
-    </div>
-
-    <div class="difficulty-grid">
-
-        <button
-            class="difficulty-btn"
-            data-difficulty="easy"
-            type="button">
-
-            <span class="difficulty-dot easy"></span>
-
-            <div>
-                <strong>EASY</strong>
-                <small>Relaxed timing</small>
-            </div>
-
-        </button>
-
-
-        <button
-            class="difficulty-btn active"
-            data-difficulty="normal"
-            type="button">
-
-            <span class="difficulty-dot normal"></span>
-
-            <div>
-                <strong>NORMAL</strong>
-                <small>Balanced challenge</small>
-            </div>
-
-        </button>
-
-
-        <button
-            class="difficulty-btn"
-            data-difficulty="hard"
-            type="button">
-
-            <span class="difficulty-dot hard"></span>
-
-            <div>
-                <strong>HARD</strong>
-                <small>Faster reactions</small>
-            </div>
-
-        </button>
-
-
-        <button
-            class="difficulty-btn"
-            data-difficulty="insane"
-            type="button">
-
-            <span class="difficulty-dot insane"></span>
-
-            <div>
-                <strong>INSANE</strong>
-                <small>Maximum challenge</small>
-            </div>
-
-        </button>
-
-    </div>
-
-    <div
-        id="difficulty-description"
-        class="difficulty-description">
-
-        Balanced timing for competitive play.
-
-    </div>
-
-</section>
-
-        <!-- =====================================
-             PERFORMANCE STRIP
-        ====================================== -->
-
-        <section class="performance-strip">
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    ROUND
-                </span>
-
-                <strong id="round">
-                    0 / 5
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    COMBO
-                </span>
-
-                <strong id="combo">
-                    0x
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    PERSONAL BEST
-                </span>
-
-                <strong id="best-score">
-                    --
-                </strong>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             PROGRESS
-        ====================================== -->
-
-        <div class="luxury-progress">
-
-            <div id="progress-bar"></div>
-
-        </div>
-
-
-        <!-- =====================================
-             MAIN GAME CARD
-        ====================================== -->
-
-        <section
-            id="game-area"
-            class="reaction-card">
-
-            <div class="reaction-glow"></div>
-
-            <div class="game-content">
-
-                <div
-                    id="countdown"
-                    class="countdown">
-                </div>
-
-
-                <div class="reaction-orb">
-
-                    <div class="orb-ring ring-one"></div>
-                    <div class="orb-ring ring-two"></div>
-                    <div class="orb-core"></div>
-
-                </div>
-
-
-                <div class="game-status">
-
-                    <span class="status-line">
-                        CURRENT SESSION
-                    </span>
-
-                    <h2 id="message">
-                        READY?
-                    </h2>
-
-                    <p id="sub-message">
-                        Test your reflexes
-                    </p>
-
-                    <div
-                        id="streak-message"
-                        class="streak-message">
-                    </div>
-
-                </div>
-
-
-                <button
-                    id="start-btn"
-                    class="primary-button"
-                    type="button">
-
-                    <span>
-                        START CHALLENGE
-                    </span>
-
-                    <b>→</b>
-
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             CURRENT PERFORMANCE
-        ====================================== -->
-
-        <section class="score-grid">
-
-            <div class="score-card">
-
-                <span>
-                    CURRENT
-                </span>
-
-                <strong id="current-score">
-                    --
-                </strong>
-
-                <small>
-                    LAST REACTION
-                </small>
-
-            </div>
-
-
-            <div class="score-card featured">
-
-                <span>
-                    AVERAGE
-                </span>
-
-                <strong id="average-score">
-                    --
-                </strong>
-
-                <small>
-                    SESSION PERFORMANCE
-                </small>
-
-            </div>
-
-
-            <div class="score-card">
-
-                <span>
-                    FASTEST
-                </span>
-
-                <strong id="fastest-score">
-                    --
-                </strong>
-
-                <small>
-                    BEST THIS SESSION
-                </small>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             SPEED
-        ====================================== -->
-
-        <section class="speed-card">
-
-            <div class="speed-top">
-
-                <div>
-
-                    <span class="section-label">
-                        REACTION VELOCITY
-                    </span>
-
-                    <strong id="speed-label">
-                        WAITING
-                    </strong>
-
-                </div>
-
-                <span class="velocity-symbol">
-                    ⚡
-                </span>
-
-            </div>
-
-
-            <div class="speed-track">
-
-                <div id="speed-meter"></div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             MODE SELECTOR
-        ====================================== -->
-
-        <section class="luxury-panel">
-
-            <div class="panel-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        CHALLENGE
-                    </span>
-
-                    <h2>
-                        Choose your mode
-                    </h2>
-
-                </div>
-
-                <span class="panel-number">
-                    01
-                </span>
-
-            </div>
-
-
-            <div class="mode-buttons">
-
-                <button
-                    class="mode-btn active"
-                    data-mode="classic"
-                    type="button">
-
-                    <span class="mode-number">
-                        01
-                    </span>
-
-                    <span class="mode-name">
-                        CLASSIC
-                    </span>
-
-                    <span class="mode-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="mode-btn"
-                    data-mode="precision"
-                    type="button">
-
-                    <span class="mode-number">
-                        02
-                    </span>
-
-                    <span class="mode-name">
-                        PRECISION
-                    </span>
-
-                    <span class="mode-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-                <button
-                    class="mode-btn"
-                    data-mode="speed"
-                    type="button">
-
-                    <span class="mode-number">
-                        03
-                    </span>
-
-                    <span class="mode-name">
-                        SPEED RUN
-                    </span>
-
-                    <span class="mode-arrow">
-                        →
-                    </span>
-
-                </button>
-
-            </div>
-
-
-            <div
-                id="mode-description"
-                class="mode-description">
-
-                5 rounds with balanced reaction timing.
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             RESULTS
-        ====================================== -->
-
-        <section
-            id="result-panel"
-            class="result-panel">
-
-            <div class="result-top">
-
-                <span class="section-label">
-                    SESSION COMPLETE
-                </span>
-
-                <div
-                    id="result-icon"
-                    class="result-icon">
-
-                    ⚡
-
-                </div>
-
-            </div>
-
-
-            <h2 id="final-rating">
-                RESULT
-            </h2>
-
-
-            <div
-                id="final-score"
-                class="final-score">
-
-                -- ms
-
-            </div>
-
-
-            <p id="final-description"></p>
-
-
-            <div class="result-stat-grid">
-
-                <div>
-                    <span>RANK</span>
-                    <strong id="final-rank">
-                        --
-                    </strong>
-                </div>
-
-                <div>
-                    <span>AVERAGE</span>
-                    <strong id="final-average">
-                        --
-                    </strong>
-                </div>
-
-                <div>
-                    <span>FASTEST</span>
-                    <strong id="final-fastest">
-                        --
-                    </strong>
-                </div>
-
-                <div>
-                    <span>CONSISTENCY</span>
-                    <strong id="consistency">
-                        --
-                    </strong>
-                </div>
-
-            </div>
-
-
-            <div
-                id="round-bars"
-                class="round-bars">
-            </div>
-
-
-            <button
-                id="play-again"
-                class="primary-button"
-                type="button">
-
-                <span>
-                    PLAY AGAIN
-                </span>
-
-                <b>↻</b>
-
+            <button id="start-btn" class="start-btn">
+                START CHALLENGE
             </button>
 
-        </section>
-
-
-        <!-- =====================================
-             HISTORY
-        ====================================== -->
-
-        <section class="luxury-panel">
-
-            <div class="panel-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        PERFORMANCE LOG
-                    </span>
-
-                    <h2>
-                        Recent runs
-                    </h2>
-
-                </div>
-
-                <span class="panel-number">
-                    02
-                </span>
-
-            </div>
-
-
-            <div
-                id="history-list"
-                class="history-list">
-
-                <span class="history-empty">
-                    No completed runs yet.
-                </span>
-
-            </div>
-
-
-            <button
-                id="clear-history"
-                class="text-button"
-                type="button">
-
-                CLEAR PERFORMANCE LOG
-
-            </button>
-
-        </section>
-
-
-        <!-- =====================================
-             RESET
-        ====================================== -->
-
-        <button
-            id="reset-btn"
-            class="reset-button"
-            type="button">
-
-            RESET SESSION
-
-        </button>
-
-
-        <!-- =====================================
-             FOOTER
-        ====================================== -->
-        <!-- V9 PERFORMANCE DASHBOARD -->
-
-<section class="v9-dashboard">
-
-    <div class="v9-dashboard-header">
-
-        <div>
-            <span class="section-label">PERFORMANCE</span>
-            <h2>Your reflex profile</h2>
         </div>
 
-        <span class="v9-live">LIVE DATA</span>
+    </section>
 
-    </div>
+    <section class="stats">
 
-
-    <div class="v9-stat-grid">
-
-        <div class="v9-stat">
-            <span>BEST REACTION</span>
-            <strong id="v9-best">--</strong>
-            <small>milliseconds</small>
+        <div class="stat-card">
+            <span>LAST</span>
+            <strong id="current-score">--</strong>
+            <small>reaction time</small>
         </div>
 
-        <div class="v9-stat">
+        <div class="stat-card featured">
             <span>AVERAGE</span>
-            <strong id="v9-average">--</strong>
-            <small>milliseconds</small>
+            <strong id="average-score">--</strong>
+            <small>5 round average</small>
         </div>
 
-        <div class="v9-stat">
-            <span>CONSISTENCY</span>
-            <strong id="v9-consistency">--</strong>
-            <small>performance</small>
+        <div class="stat-card">
+            <span>FASTEST</span>
+            <strong id="fastest-score">--</strong>
+            <small>best this game</small>
         </div>
 
-        <div class="v9-stat">
-            <span>RUNS</span>
-            <strong id="v9-runs">0</strong>
-            <small>completed</small>
+    </section>
+
+    <section id="meter-section" class="meter-section">
+
+        <div class="meter-header">
+            <span>REACTION SPEED</span>
+            <strong id="speed-label">WAITING</strong>
         </div>
 
-    </div>
+        <div class="speed-track">
+            <div id="speed-meter"></div>
+        </div>
 
+    </section>
 
-    <div class="v9-chart-card">
+    <section id="result-panel" class="result-panel">
 
-        <div class="v9-chart-header">
+        <div id="result-icon" class="result-icon">
+            🏆
+        </div>
+
+        <p class="result-label">
+            CHALLENGE COMPLETE
+        </p>
+
+        <h2 id="final-score">--</h2>
+
+        <div id="final-rating" class="final-rating">
+            ELITE
+        </div>
+
+        <p id="final-description" class="final-description">
+            Excellent performance
+        </p>
+
+        <div class="rank-box">
+            <span>YOUR RANK</span>
+            <strong id="final-rank">A</strong>
+        </div>
+
+        <div class="result-grid">
 
             <div>
-                <span class="section-label">REACTION TREND</span>
-                <h3>Recent performance</h3>
+                <span>AVERAGE</span>
+                <strong id="final-average">--</strong>
             </div>
 
-            <span id="v9-trend">
-                WAITING
-            </span>
+            <div>
+                <span>FASTEST</span>
+                <strong id="final-fastest">--</strong>
+            </div>
 
-        </div>
-
-        <div class="v9-chart">
-
-            <div class="chart-line"></div>
-
-            <div class="chart-points">
-
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-
+            <div>
+                <span>CONSISTENCY</span>
+                <strong id="consistency">--</strong>
             </div>
 
         </div>
 
-    </div>
-
-</section>
-<!-- THEME SELECTOR -->
-<section class="theme-panel">
-
-    <div class="theme-panel-header">
-        <div>
-            <span class="section-label">APPEARANCE</span>
-            <h2>Choose your theme</h2>
+        <div class="history-title">
+            ROUND PERFORMANCE
         </div>
 
-        <span class="theme-counter">06 THEMES</span>
-    </div>
+        <div id="round-bars" class="round-bars"></div>
 
-    <div class="theme-grid">
-
-        <button class="theme-choice active" data-theme="obsidian">
-            <span class="theme-dot obsidian-dot"></span>
-            <span>Obsidian</span>
+        <button id="play-again" class="start-btn">
+            PLAY AGAIN
         </button>
 
-        <button class="theme-choice" data-theme="sapphire">
-            <span class="theme-dot sapphire-dot"></span>
-            <span>Sapphire</span>
-        </button>
+    </section>
 
-        <button class="theme-choice" data-theme="amethyst">
-            <span class="theme-dot amethyst-dot"></span>
-            <span>Amethyst</span>
-        </button>
-
-        <button class="theme-choice" data-theme="emerald">
-            <span class="theme-dot emerald-dot"></span>
-            <span>Emerald</span>
-        </button>
-
-        <button class="theme-choice" data-theme="burgundy">
-            <span class="theme-dot burgundy-dot"></span>
-            <span>Burgundy</span>
-        </button>
-
-        <button class="theme-choice" data-theme="ivory">
-            <span class="theme-dot ivory-dot"></span>
-            <span>Ivory</span>
-        </button>
-
-    </div>
-
-</section>
-        <footer class="footer">
-
-            <span>
-                REACTION MASTER
-            </span>
-
-            <span>
-                LUXURY EDITION
-            </span>
-
-            <span>
-                V8.4
-            </span>
-
-        </footer>
-
-    </main>
-
-</div>
-<!-- =========================================
-     V9.2 ACHIEVEMENTS
-========================================= -->
-
-<section class="achievement-panel">
-
-    <div class="achievement-header">
+    <footer class="game-footer">
 
         <div>
-            <span class="section-label">MILESTONES</span>
-            <h2>Achievements</h2>
+            Controls
+            <strong>CLICK / SPACE</strong>
         </div>
 
-        <span id="achievement-count">
-            0 / 8
-        </span>
+        <button id="reset-btn" class="reset-btn">
+            Reset
+        </button>
 
-    </div>
+    </footer>
 
-
-    <div class="achievement-grid">
-
-        <div class="achievement-card" data-achievement="first">
-            <div class="achievement-icon">⚡</div>
-            <div>
-                <strong>FIRST REACTION</strong>
-                <small>Complete your first run</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="fast">
-            <div class="achievement-icon">🔥</div>
-            <div>
-                <strong>SPEED DEMON</strong>
-                <small>React under 200 ms</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="lightning">
-            <div class="achievement-icon">⚡</div>
-            <div>
-                <strong>LIGHTNING</strong>
-                <small>React under 150 ms</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="perfect">
-            <div class="achievement-icon">💎</div>
-            <div>
-                <strong>PERFECT RUN</strong>
-                <small>Complete a run under 220 ms</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="combo">
-            <div class="achievement-icon">🔥</div>
-            <div>
-                <strong>COMBO MASTER</strong>
-                <small>Reach a 5x combo</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="runs">
-            <div class="achievement-icon">🏆</div>
-            <div>
-                <strong>DEDICATED</strong>
-                <small>Complete 10 runs</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="elite">
-            <div class="achievement-icon">👑</div>
-            <div>
-                <strong>ELITE</strong>
-                <small>Average under 180 ms</small>
-            </div>
-        </div>
-
-
-        <div class="achievement-card" data-achievement="legend">
-            <div class="achievement-icon">💠</div>
-            <div>
-                <strong>LEGEND</strong>
-                <small>Complete 25 runs</small>
-            </div>
-        </div>
-
-    </div>
-
-</section>
+</main>
 
 <script src="script.js"></script>
 
 </body>
-
 </html>
