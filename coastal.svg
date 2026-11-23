@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 450">
+  <defs>
+    <g id="palm">
+      <path d="M-9 310C-6 229 6 126 49 63l12 4C24 142 19 230 16 310z"/>
+      <path d="M51 71C19 15-28 14-69 49c42-16 74-9 107 20C-12 48-46 69-56 114c32-30 57-41 100-37-41 11-61 44-46 87 13-44 31-65 57-82 25 10 42 38 51 76 17-40-6-72-40-82 45-4 73 11 95 39-7-44-47-64-96-48 29-28 60-39 94-32C115 8 73 25 51 71z"/>
+    </g>
+  </defs>
+  <path fill="#563052" d="M0 318h54v-25h44v-43h31v87h55v-58h22v-14h53v46h50v-36h26v-38h57v109h28v-66h57v34h29v-73h28v-24h44v104h43v-61h34v-29h57v87h32v-40h62v45h47v-76h53v38h54v-24h40v138H0z"/>
+  <path fill="#321337" d="M0 370q210-45 415 0t545-13v93H0z"/>
+  <g fill="#29102e">
+    <use href="#palm" transform="translate(107 134) scale(1.02)"/>
+    <use href="#palm" transform="translate(187 190) scale(.85)"/>
+    <use href="#palm" transform="translate(878 100) scale(-1.15 1.15)"/>
+  </g>
+</svg>

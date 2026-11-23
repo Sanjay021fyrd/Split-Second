@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="neon">
+<html lang="en" data-theme="avocado">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Split Second - a reaction-time game with Lights Out, Classic, Go / No-Go and 2-player Duel modes, themes and animations.">
-    <meta name="theme-color" content="#050816" id="meta-theme">
+    <meta name="theme-color" content="#eef4d9" id="meta-theme">
     <title>Split Second | Reaction Time Game</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
@@ -15,7 +15,93 @@
 
 <canvas id="ambient" class="ambient" aria-hidden="true"></canvas>
 
-<main class="game-container">
+<section class="auth-panel" aria-labelledby="sign-in-title">
+    <div id="login-panel">
+        <h1 id="sign-in-title">Split Second</h1>
+        <p>Sign in to play the reaction time challenge.</p>
+        <a id="google-login" class="auth-button" href="/auth/google" hidden>Sign in with Google</a>
+    </div>
+    <div id="account-panel" hidden>
+        <strong id="account-name"></strong>
+        <span id="account-email"></span>
+        <button id="logout-btn" class="auth-button" type="button">Log out</button>
+    </div>
+    <p id="auth-status" role="status">Checking your sign-in status…</p>
+</section>
+
+<section id="competition" class="auth-panel" aria-labelledby="competition-title" hidden>
+    <div class="competition-menu">
+        <header class="competition-heading">
+            <h2 id="competition-title">Competition hub</h2>
+            <p>Warm up, chase a faster time, or race a friend.</p>
+        </header>
+
+        <div id="competition-members" hidden>
+            <button id="competition-practice" class="competition-card" type="button">
+                <span class="competition-icon" aria-hidden="true">&#9678;</span>
+                <span class="competition-card-title">Practice</span>
+                <span class="competition-card-meta">1 round &middot; Unranked</span>
+                <span class="competition-card-action">Warm up <span aria-hidden="true">&rarr;</span></span>
+            </button>
+            <button id="competition-weekly" class="competition-card" type="button">
+                <span class="competition-icon" aria-hidden="true">&#8599;</span>
+                <span class="competition-card-title">Weekly ranked</span>
+                <span class="competition-card-meta">5 rounds &middot; Best median time</span>
+                <span class="competition-card-action">Start ranked run <span aria-hidden="true">&rarr;</span></span>
+            </button>
+            <button id="competition-daily" class="competition-card" type="button">
+                <span class="competition-icon" aria-hidden="true">&#9728;</span>
+                <span class="competition-card-title">Daily challenge</span>
+                <span class="competition-card-meta">3 rounds &middot; Resets at 00:00 UTC</span>
+                <span class="competition-card-action">Play today <span aria-hidden="true">&rarr;</span></span>
+            </button>
+            <button id="competition-create" class="competition-card" type="button">
+                <span class="competition-icon" aria-hidden="true">&#8644;</span>
+                <span class="competition-card-title">Online duel</span>
+                <span class="competition-card-meta">3 rounds &middot; 2 players</span>
+                <span class="competition-card-action">Create room <span aria-hidden="true">&rarr;</span></span>
+            </button>
+        </div>
+
+        <form id="competition-join">
+            <label for="competition-room">Have a room code?</label>
+            <div class="competition-join-fields">
+                <input id="competition-room" placeholder="8-character code" maxlength="8"
+                    minlength="8" pattern="[A-Fa-f0-9]{8}" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+                <button class="auth-button" type="submit">Join duel</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="competition-arena" hidden>
+        <div class="competition-arena-header">
+            <p id="competition-status" role="status"></p>
+            <button id="competition-back" class="auth-button" type="button"><span aria-hidden="true">&larr;</span> Back to hub</button>
+        </div>
+        <button id="competition-signal" type="button">WAIT</button>
+        <ol id="competition-results"></ol>
+        <button id="competition-share" class="auth-button" type="button" hidden>Share daily result card</button>
+    </div>
+
+    <details class="competition-menu competition-leaderboards">
+        <summary>Leaderboards</summary>
+        <div class="competition-board-content">
+            <div class="competition-board-header">
+                <label>Board
+                    <select id="competition-board-mode">
+                        <option value="ranked">Weekly ranked</option>
+                        <option value="daily">Daily challenge</option>
+                    </select>
+                </label>
+                <p id="competition-board-note" role="status">Loading scores&hellip;</p>
+            </div>
+            <ol id="competition-board"></ol>
+            <p id="competition-privacy">Ranked and daily scores display your Google account name publicly.</p>
+        </div>
+    </details>
+</section>
+
+<main id="game" class="game-container" hidden>
 
     <header class="game-header">
         <div class="brand">
@@ -28,16 +114,20 @@
 
         <div class="header-tools">
 
-            <div class="xp" title="Play to earn XP and unlock themes">
+            <div class="xp" title="Play to earn XP">
                 <span id="level" class="level">LV 1</span>
                 <div class="xp-track" aria-hidden="true"><i id="xp-fill"></i></div>
                 <small id="xp-text">0 / 250 XP</small>
             </div>
 
-            <div id="themes" class="themes" role="group" aria-label="Theme">
-                <button class="theme-btn" type="button" data-theme="neon" aria-pressed="true" title="Neon Arcade"></button>
-                <button class="theme-btn" type="button" data-theme="samurai" aria-pressed="false" title="Samurai"></button>
-                <button class="theme-btn" type="button" data-theme="space" aria-pressed="false" title="Deep Space"></button>
+            <div class="game-options">
+                <label>Theme <select id="theme-select"></select></label>
+                <label>Rounds
+                    <select id="round-select">
+                        <option value="3">3 rounds</option>
+                        <option value="5">5 rounds</option>
+                    </select>
+                </label>
             </div>
 
             <button id="sound-btn" class="icon-btn" type="button"
@@ -49,7 +139,7 @@
         <span id="mode-pill" class="mode-pill" aria-hidden="true"></span>
         <button class="mode-btn active" type="button" data-mode="classic" aria-pressed="true">
             <strong>Classic</strong>
-            <small>5 rounds</small>
+            <small>Reaction test</small>
         </button>
         <button class="mode-btn" type="button" data-mode="lights" aria-pressed="false">
             <strong>Lights Out</strong>
@@ -61,14 +151,14 @@
         </button>
         <button class="mode-btn" type="button" data-mode="duel" aria-pressed="false">
             <strong>2-Player Duel</strong>
-            <small>First to 3</small>
+            <small>Most rounds won</small>
         </button>
     </nav>
 
     <section class="hud">
         <div class="hud-card" data-tilt>
             <span id="hud1-label">ROUND</span>
-            <strong id="round">0 / 5</strong>
+            <strong id="round">0 / 3</strong>
         </div>
 
         <div class="hud-card" data-tilt>
@@ -268,9 +358,7 @@
 
 <div id="sr-live" class="sr-only" aria-live="polite"></div>
 
-<script src="fx.js"></script>
-<script src="viz.js"></script>
-<script src="script.js"></script>
+<script src="auth.js" defer></script>
 
 </body>
 </html>

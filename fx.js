@@ -14,7 +14,6 @@ const Fx = (() => {
     const layer = document.getElementById("fx");
 
     const rand = (a, b) => a + Math.random() * (b - a);
-    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
     function restart(el, className) {
         el.classList.remove(className);
@@ -213,39 +212,12 @@ const Fx = (() => {
             el.classList.add("tilting");
             el.style.transform =
                 "perspective(700px) rotateX(" + ((0.5 - py) * 10).toFixed(2) + "deg) rotateY(" + ((px - 0.5) * 12).toFixed(2) + "deg)";
-            el.style.setProperty("--mx", px * 100 + "%");
-            el.style.setProperty("--my", py * 100 + "%");
         }, { passive: true });
 
         document.documentElement.addEventListener("mouseleave", () => {
             reset(current);
             current = null;
         });
-    }
-
-    function initMagnetic() {
-        if (reduced || coarse) return;
-
-        const selector = ".start-btn, .ghost-btn, .icon-btn";
-
-        document.addEventListener("pointermove", (event) => {
-            document.querySelectorAll(selector).forEach((button) => {
-                const r = button.getBoundingClientRect();
-                if (!r.width) return;
-
-                const dx = event.clientX - (r.left + r.width / 2);
-                const dy = event.clientY - (r.top + r.height / 2);
-                const reach = Math.max(r.width, r.height) / 2 + 70;
-
-                if (Math.hypot(dx, dy) < reach) {
-                    button.style.setProperty("--tx", clamp(dx * 0.22, -9, 9) + "px");
-                    button.style.setProperty("--ty", clamp(dy * 0.3, -8, 8) + "px");
-                } else if (button.style.getPropertyValue("--tx")) {
-                    button.style.removeProperty("--tx");
-                    button.style.removeProperty("--ty");
-                }
-            });
-        }, { passive: true });
     }
 
     function initRipple() {
@@ -271,15 +243,6 @@ const Fx = (() => {
         });
     }
 
-    // A soft light that follows the pointer inside the game area.
-    function initGlow() {
-        area.addEventListener("pointermove", (event) => {
-            const r = area.getBoundingClientRect();
-            area.style.setProperty("--mx", event.clientX - r.left + "px");
-            area.style.setProperty("--my", event.clientY - r.top + "px");
-        }, { passive: true });
-    }
-
     // The sliding highlight behind the active mode button.
     function movePill() {
         const pill = document.getElementById("mode-pill");
@@ -301,7 +264,7 @@ const Fx = (() => {
 
         let w = 0;
         let h = 0;
-        let theme = "neon";
+        let theme = "motes";
         let items = [];
         let warpLevel = 0;
         let warpTarget = 0;
@@ -313,9 +276,10 @@ const Fx = (() => {
         const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
         function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
             w = window.innerWidth;
             h = window.innerHeight;
+            // Decorative art can use a low-resolution buffer, even on 4K screens.
+            const dpr = Math.min(coarse ? 0.75 : 1, Math.sqrt(900000 / Math.max(1, w * h)));
             canvas.width = w * dpr;
             canvas.height = h * dpr;
             canvas.style.width = w + "px";
@@ -324,11 +288,11 @@ const Fx = (() => {
         }
 
         function make(initial) {
-            if (theme === "space") {
+            if (theme === "stars") {
                 return { x: rand(-1, 1), y: rand(-1, 1), z: initial ? rand(0.05, 1) : 1,
                          tint: Math.random() < 0.7 ? "255,255,255" : "196,181,253" };
             }
-            if (theme === "samurai") {
+            if (theme === "petals") {
                 return { x: rand(0, w), y: initial ? rand(-20, h) : -20, s: rand(0.4, 1),
                          r: rand(0, 6.28), v: rand(18, 42), sw: rand(0, 6.28), size: rand(5, 11) };
             }
@@ -337,7 +301,7 @@ const Fx = (() => {
         }
 
         function seed() {
-            const count = theme === "space" ? 130 : theme === "samurai" ? 34 : 55;
+            const count = theme === "stars" ? 65 : theme === "petals" ? 18 : 28;
             items = Array.from({ length: count }, () => make(true));
         }
 
@@ -416,14 +380,16 @@ const Fx = (() => {
             warpLevel += (warpTarget - warpLevel) * Math.min(1, dt * 8);
             ctx.clearRect(0, 0, w, h);
 
-            if (theme === "space") drawSpace(dt);
-            else if (theme === "samurai") drawPetals(dt);
+            if (theme === "stars") drawSpace(dt);
+            else if (theme === "petals") drawPetals(dt);
             else drawMotes(dt, now);
         }
 
         function loop(now) {
             raf = requestAnimationFrame(loop);
-            const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+            // Keep game signals at display refresh rate while drawing the background at ~30 fps.
+            if (now - last < 31) return;
+            const dt = Math.min(0.08, (now - last) / 1000);
             last = now;
             frame(dt, now);
         }
@@ -431,6 +397,7 @@ const Fx = (() => {
         function start() {
             cancelAnimationFrame(raf);
 
+            if (document.hidden) return;
             if (reduced) {
                 frame(0.016, performance.now());   // one still frame
                 return;
@@ -448,7 +415,7 @@ const Fx = (() => {
         }
 
         function warp() {
-            if (reduced || theme !== "space") return;
+            if (reduced || theme !== "stars") return;
             warpTarget = 1;
             clearTimeout(warpTimer);
             warpTimer = setTimeout(() => { warpTarget = 0; }, 650);
@@ -470,9 +437,7 @@ const Fx = (() => {
     function init() {
         Ambient.init();
         initTilt();
-        initMagnetic();
         initRipple();
-        initGlow();
 
         movePill();
         window.addEventListener("resize", movePill);

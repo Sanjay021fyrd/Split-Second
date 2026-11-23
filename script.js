@@ -8,10 +8,11 @@
 
 /* ---------- Config ---------- */
 
-const TOTAL_ROUNDS = 5;        // classic, lights out, go/no-go
-const DUEL_WINS = 3;
+const DEFAULT_ROUNDS = 3;
+const ROUND_CHOICES = [3, 5];
 const MIN_DELAY = 2000;        // random wait before the signal (ms)
 const MAX_DELAY = 5000;
+const RESPONSE_MS = 3000;     // maximum time to press after GO
 const ANTICIPATION_MS = 100;   // faster than this is a guess, not a reaction
 const STREAK_LIMIT_MS = 300;
 const DECOY_CHANCE = 0.4;
@@ -51,17 +52,50 @@ const MODES = {
     },
     duel: {
         short: "Duel",
-        intro: "Two players, one screen. First to " + DUEL_WINS + " round wins.",
+        intro: "Two players, one screen. Win more rounds than your opponent.",
         start: "START DUEL",
         controls: "P1: Q or tap left  ·  P2: P or tap right",
         label: "DUEL COMPLETE"
     }
 };
 
+const DEFAULT_THEME = "avocado";
 const THEMES = {
-    neon:    { name: "Neon Arcade", level: 1, bg: "#050816", wait: "WAIT...",   go: "CLICK!",   goSub: "NOW!",    impact: "ring" },
-    samurai: { name: "Samurai",     level: 2, bg: "#12060a", wait: "STEADY...", go: "DRAW!",    goSub: "STRIKE!", impact: "slash" },
-    space:   { name: "Deep Space",  level: 3, bg: "#02030d", wait: "STANDBY...", go: "LAUNCH!", goSub: "ENGAGE!", impact: "ring" }
+    avocado: {
+        name: "Avocado Grove", ambient: "motes", wait: "WAIT...", go: "CLICK!", goSub: "NOW!", impact: "ring",
+        style: { bg: "#eef4d9", panel: "#f8fbe9", text: "#263819", muted: "#435632", dim: "#475933",
+            accent: "#3b601f", "accent-2": "#59691f", "accent-soft": "#365219", "area-1": "#f2f7d8", "area-2": "#c8dc8d",
+            font: '"Segoe UI", Arial, sans-serif', "title-font": 'Georgia, serif',
+            "theme-backdrop": "radial-gradient(ellipse at bottom, #b4d476, transparent 65%)" }
+    },
+    samurai: {
+        name: "Samurai", ambient: "petals", wait: "STEADY...", go: "DRAW!", goSub: "STRIKE!", impact: "slash",
+        style: { bg: "#12060a", panel: "#220c12", text: "#fff5f6", muted: "#c4a3ab", dim: "#b9949e",
+            accent: "#e11d48", "accent-2": "#b86504", "accent-soft": "#fda4af", "area-1": "#2c1119", "area-2": "#12060a",
+            font: 'Georgia, "Times New Roman", serif', "title-case": "uppercase", "title-track": "3px" }
+    },
+    space: {
+        name: "Deep Space", ambient: "stars", wait: "STANDBY...", go: "LAUNCH!", goSub: "ENGAGE!", impact: "ring",
+        style: { bg: "#02030d", panel: "#10122a", text: "#f8fafc", muted: "#aeb7d1", dim: "#a1acc8",
+            accent: "#7650d1", "accent-2": "#08788f", "accent-soft": "#c4b5fd", "area-1": "#0f1536", "area-2": "#04061a",
+            font: '"Trebuchet MS", "Segoe UI", sans-serif', "title-case": "uppercase", "title-track": "2px" }
+    },
+    gta: {
+        name: "GTA 6 Theme", ambient: "motes", wait: "HOLD...", go: "CLICK!", goSub: "NOW!", impact: "ring",
+        style: { bg: "#39134c", panel: "#291333", text: "#fff6f3", muted: "#f6bfcd", dim: "#e5b0ca",
+            accent: "#ad2266", "accent-2": "#a8431f", "accent-soft": "#ffb4bc", "area-1": "#63194e", "area-2": "#321747",
+            font: '"Arial Black", "Segoe UI", sans-serif',
+            "theme-backdrop": "linear-gradient(180deg, #572878, #e64987 53%, #ff9d59 75%, #39134c)",
+            "theme-art": 'url("coastal.svg")' }
+    },
+    egyptian: {
+        name: "Egyptian Theme", ambient: "motes", wait: "STEADY...", go: "CLICK!", goSub: "NOW!", impact: "ring",
+        style: { bg: "#362312", panel: "#fff0cb", text: "#382617", muted: "#59422b", dim: "#61472d",
+            accent: "#76521e", "accent-2": "#176059", "accent-soft": "#654419", "area-1": "#fff1cc", "area-2": "#e1bc76",
+            font: 'Georgia, serif', "title-case": "uppercase", "title-track": "1px",
+            "theme-backdrop": "linear-gradient(180deg, #293a40, #8b6843 55%, #d5a355 78%, #362312)",
+            "theme-art": 'url("ruins.svg")' }
+    }
 };
 
 /* One table drives the speed meter, round messages, rank and final title,
@@ -100,7 +134,8 @@ const shareButton = $("share-btn");
 const saveButton = $("save-btn");
 const soundButton = $("sound-btn");
 const modeButtons = document.querySelectorAll(".mode-btn");
-const themeButtons = document.querySelectorAll(".theme-btn");
+const themeSelect = $("theme-select");
+const roundSelect = $("round-select");
 const controlsHint = $("controls-hint");
 
 const hud1Label = $("hud1-label");
@@ -146,7 +181,7 @@ const reducedMotion = Fx.reduced;
 /* ---------- Saved data (safe if localStorage is blocked) ---------- */
 
 function loadStore() {
-    const store = { bestSingle: null, bestAvg: {}, history: [], muted: false, mode: "classic", theme: "neon", xp: 0 };
+    const store = { bestSingle: null, bestAvg: {}, history: [], muted: false, mode: "classic", theme: DEFAULT_THEME, rounds: DEFAULT_ROUNDS, xp: 0 };
 
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -170,7 +205,9 @@ function loadStore() {
     if (!store.bestAvg || typeof store.bestAvg !== "object") store.bestAvg = {};
     if (!Array.isArray(store.history)) store.history = [];
     if (!MODES[store.mode]) store.mode = "classic";
-    if (!THEMES[store.theme]) store.theme = "neon";
+    if (store.theme === "uncharted") store.theme = "egyptian";
+    if (!Object.hasOwn(THEMES, store.theme)) store.theme = DEFAULT_THEME;
+    if (!ROUND_CHOICES.includes(store.rounds)) store.rounds = DEFAULT_ROUNDS;
     store.xp = Number.isFinite(store.xp) && store.xp > 0 ? Math.floor(store.xp) : 0;
     store.muted = Boolean(store.muted);
 
@@ -192,11 +229,15 @@ const store = loadStore();
 const PLAY_STATES = ["waiting", "signal", "ready", "decoy", "between", "false-start", "suspended"];
 
 let mode = store.mode;
+let isGameActive = false;
+let roundLimit = store.rounds;
 let theme = store.theme;
 let state = "idle";   // idle | waiting | signal | ready | decoy | between | false-start | suspended | finished
 let round = 0;
 let streak = 0;
 let times = [];
+let attempts = [];
+let misses = 0;
 let falseStarts = 0;
 let decoysDodged = 0;
 let decoysThisRound = 0;
@@ -299,7 +340,7 @@ function ensureAudio() {
             if (Ctx) audioCtx = new Ctx();
         }
         if (audioCtx && audioCtx.state === "suspended") {
-            audioCtx.resume();
+            audioCtx.resume().catch(() => {});
         }
     } catch (error) {
         audioCtx = null;
@@ -326,19 +367,16 @@ function tone(freq, start, duration, type = "sine", volume = 0.1) {
     osc.stop(t + duration + 0.05);
 }
 
-const SOUNDS = {
-    go() { tone(880, 0, 0.14, "square", 0.07); },
-    tick(i) { tone(300 + i * 80, 0, 0.1, "square", 0.05); },
-    decoy() { tone(330, 0, 0.1, "triangle", 0.12); tone(330, 0.17, 0.1, "triangle", 0.12); },
-    hit() { tone(660, 0, 0.09, "sine", 0.12); tone(990, 0.08, 0.14, "sine", 0.12); },
-    thud() { tone(95, 0, 0.2, "sine", 0.3); tone(55, 0, 0.28, "sine", 0.25); },
-    fail() { tone(190, 0, 0.22, "sawtooth", 0.09); tone(130, 0.12, 0.3, "sawtooth", 0.09); },
-    win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.1, 0.22, "triangle", 0.12)); }
-};
-
-function play(name, arg) {
+// A short rising chime for a hit, a soft descending knock for a mistake.
+function playPressSound(success) {
     ensureAudio();
-    if (SOUNDS[name]) SOUNDS[name](arg);
+    if (success) {
+        tone(740, 0, 0.055, "triangle", 0.09);
+        tone(1110, 0.035, 0.095, "sine", 0.11);
+    } else {
+        tone(260, 0, 0.065, "triangle", 0.10);
+        tone(145, 0.045, 0.10, "sine", 0.10);
+    }
 }
 
 function vibrate(pattern) {
@@ -367,7 +405,6 @@ function renderXp() {
     xpFill.style.width = (into / XP_PER_LEVEL) * 100 + "%";
     xpText.textContent = into + " / " + XP_PER_LEVEL + " XP";
 
-    renderThemeButtons();
 }
 
 function awardXp(amount) {
@@ -381,33 +418,44 @@ function awardXp(amount) {
     if (after > before) pendingLevel = after;
 }
 
-function renderThemeButtons() {
-    const level = levelOf(store.xp);
-
-    themeButtons.forEach((button) => {
-        const id = button.dataset.theme;
-        const info = THEMES[id];
-        const locked = level < info.level;
-
-        button.classList.toggle("locked", locked);
-        button.setAttribute("aria-pressed", String(id === theme));
-        button.title = locked ? info.name + " - unlocks at level " + info.level : info.name;
-        button.setAttribute("aria-label", button.title);
-    });
+function setGameActive(active) {
+    isGameActive = active;
+    themeSelect.disabled = active;
+    roundSelect.disabled = active;
 }
 
 function applyTheme(id) {
-    if (!THEMES[id] || levelOf(store.xp) < THEMES[id].level) id = "neon";
+    if (isGameActive || !Object.hasOwn(THEMES, id)) return;
+
+    const root = document.documentElement;
+    const previous = THEMES[theme];
+    Object.keys(previous.style).forEach((key) => root.style.removeProperty("--" + key));
 
     theme = id;
     store.theme = id;
     saveStore();
 
-    document.documentElement.dataset.theme = id;
-    $("meta-theme").setAttribute("content", THEMES[id].bg);
+    const config = THEMES[id];
+    for (const [key, value] of Object.entries(config.style)) {
+        root.style.setProperty("--" + key, value);
+    }
+    for (const [name, color] of [["accent-rgb", config.style.accent], ["accent2-rgb", config.style["accent-2"]]]) {
+        root.style.setProperty("--" + name, color.slice(1).match(/../g).map((part) => parseInt(part, 16)).join(", "));
+    }
 
-    Fx.ambient.setTheme(id);
-    renderThemeButtons();
+    root.dataset.theme = id;
+    themeSelect.value = id;
+    $("meta-theme").setAttribute("content", config.style.bg);
+    Fx.ambient.setTheme(config.ambient);
+}
+
+function setRoundLimit(value) {
+    if (isGameActive || !ROUND_CHOICES.includes(value)) return;
+    store.rounds = value;
+    roundLimit = value;
+    roundSelect.value = String(value);
+    saveStore();
+    if (state === "idle") renderHud();
 }
 
 function showBanner(title, sub) {
@@ -431,12 +479,8 @@ function announceLevelUp() {
     const level = pendingLevel;
     pendingLevel = 0;
 
-    const unlocked = Object.values(THEMES).filter((info) => info.level === level);
-    const sub = unlocked.length ? unlocked.map((info) => info.name).join(", ") + " theme unlocked!" : "Keep going!";
-
-    showBanner("LEVEL UP · LV " + level, sub);
+    showBanner("LEVEL UP · LV " + level, "Keep going!");
     Fx.burst(40);
-    play("win");
 }
 
 /* ---------- Rendering helpers ---------- */
@@ -478,7 +522,7 @@ function countUp(element, target, suffix, duration = 700) {
 function renderHud() {
     if (mode === "duel") {
         hud1Label.textContent = "ROUND";
-        Fx.setText(roundDisplay, round > 0 ? String(round) : "-");
+        Fx.setText(roundDisplay, round + " / " + roundLimit);
         hud2Label.textContent = "P1 · Q";
         Fx.setText(comboDisplay, String(duel.p1));
         hud3Label.textContent = "P2 · P";
@@ -487,7 +531,7 @@ function renderHud() {
     }
 
     hud1Label.textContent = "ROUND";
-    Fx.setText(roundDisplay, Math.min(round, TOTAL_ROUNDS) + " / " + TOTAL_ROUNDS);
+    Fx.setText(roundDisplay, Math.min(round, roundLimit) + " / " + roundLimit);
     hud2Label.textContent = "STREAK";
     Fx.setText(comboDisplay, streak + "x");
     hud3Label.textContent = "BEST";
@@ -533,6 +577,7 @@ function resetLights() {
 /* ---------- Mode and reset ---------- */
 
 function resetValues() {
+    setGameActive(false);
     cancelAll();
     Fx.clear();
 
@@ -540,6 +585,8 @@ function resetValues() {
     round = 0;
     streak = 0;
     times = [];
+    attempts = [];
+    misses = 0;
     falseStarts = 0;
     decoysDodged = 0;
     decoysThisRound = 0;
@@ -589,7 +636,9 @@ function setMode(next) {
 }
 
 function startChallenge() {
+    if (isGameActive) return;
     resetValues();
+    setGameActive(true);
     ensureAudio();
 
     runStartBest = store.bestSingle;
@@ -622,14 +671,12 @@ function beginRound(repeat = false) {
         lightsEl.hidden = true;
     }
 
+    setProgress((round - 1) / roundLimit);
     if (mode === "duel") {
-        setProgress(Math.max(duel.p1, duel.p2) / DUEL_WINS);
         setMessage(T().wait, "Don't press until the screen turns green!");
     } else if (mode === "lights") {
-        setProgress((round - 1) / TOTAL_ROUNDS);
         setMessage(T().wait, "Wait for the lights to go OUT.");
     } else {
-        setProgress((round - 1) / TOTAL_ROUNDS);
         setMessage(T().wait, "Do not click yet.");
     }
 
@@ -657,7 +704,6 @@ function runLights() {
         }
 
         lightEls[i].classList.add("on");
-        play("tick", i);
         schedule(() => lightStep(i + 1), LIGHT_STEP_MS);
     };
 
@@ -688,14 +734,14 @@ function showGo() {
     setArea("ready");
     speedLabel.textContent = "REACT!";
 
-    play("go");
-    if (theme === "space") Fx.ambient.warp();
+    Fx.ambient.warp();
 
     // Start the clock when the green frame is actually drawn, not when this
     // code runs, so the screen-refresh delay is not counted against the player.
     rafId = requestAnimationFrame(() => {
         startTime = performance.now();
         state = "ready";
+        schedule(missRound, RESPONSE_MS);
     });
 }
 
@@ -708,7 +754,6 @@ function showDecoy() {
     setMessage("HOLD!", "Decoy - do NOT click.");
     speedLabel.textContent = "HOLD STILL";
 
-    play("decoy");
 
     schedule(() => {
         decoysDodged++;
@@ -731,10 +776,12 @@ function handlePress(side, ts, point) {
         return;
     }
 
-    if (state === "ready") {
-        const reaction = Math.round(ts - startTime);
+    if (state === "ready" || state === "signal") {
+        const reaction = state === "signal" ? 0 : Math.round(ts - startTime);
 
-        if (reaction < ANTICIPATION_MS) {
+        if (reaction >= RESPONSE_MS) {
+            missRound();
+        } else if (reaction < ANTICIPATION_MS) {
             falseStart("TOO FAST!", "That was a guess, not a reaction.");
         } else {
             finishRound(reaction, point);
@@ -759,7 +806,9 @@ function handlePress(side, ts, point) {
 function finishRound(reaction, point) {
     const tier = tierFor(reaction);
 
+    attempts.push({ time: reaction });
     times.push(reaction);
+    playPressSound(true);
     streak = reaction < STREAK_LIMIT_MS ? streak + 1 : 0;
 
     if (store.bestSingle === null || reaction < store.bestSingle) {
@@ -776,7 +825,6 @@ function finishRound(reaction, point) {
     // never affects the score.
     Fx.impact({ point, reaction, tier, style: T().impact });
     Fx.freeze(HIT_STOP_MS);
-    play("thud");
 
     schedule(() => revealHit(reaction, tier), reducedMotion ? 0 : HIT_STOP_MS);
 }
@@ -791,41 +839,63 @@ function revealHit(reaction, tier) {
     Fx.restart(message, "slam");
 
     updateSpeed(reaction, tier);
-    setProgress(round / TOTAL_ROUNDS);
     renderStats();
     renderHud();
 
-    play("hit");
 
-    if (round >= TOTAL_ROUNDS) {
-        schedule(showResults, 1100);
-    } else {
-        schedule(beginRound, BETWEEN_MS);
-    }
+    advanceSolo(BETWEEN_MS, 1100);
 }
 
-// A false start no longer ends the whole run: the same round is replayed.
+function advanceSolo(nextDelay, resultsDelay = nextDelay) {
+    setProgress(round / roundLimit);
+    schedule(round >= roundLimit ? showResults : beginRound,
+        round >= roundLimit ? resultsDelay : nextDelay);
+}
+
+function missRound() {
+    if (mode === "duel") {
+        cancelAll();
+        duel.rounds.push({ winner: null, time: null });
+        state = "between";
+        setArea("too-early");
+        setIcon("");
+        setMessage("TIME'S UP!", "No point. Next round...");
+        speedLabel.textContent = "MISSED";
+        advanceDuel(FALSE_START_MS);
+        return;
+    }
+
+    finishFailedRound("TIME'S UP!", "No reaction recorded.", "MISS");
+}
+
 function falseStart(title, sub) {
+    playPressSound(false);
+    finishFailedRound(title, sub, "FS");
+    Fx.shake(12);
+    Fx.flash(0.3, "#ef4444");
+    vibrate([80, 40, 80]);
+}
+
+function finishFailedRound(title, sub, outcome) {
     cancelAll();
 
     state = "false-start";
-    falseStarts++;
+    attempts.push({ time: null, outcome });
+    if (outcome === "FS") falseStarts++;
+    else misses++;
     streak = 0;
 
     setArea("too-early");
-    setIcon("✖");
-    setMessage(title, sub + " Same round again...");
+    setIcon("");
+    resetLights();
+    lightsEl.hidden = true;
+    setMessage(title, sub + (round >= roundLimit ? " Results coming up..." : " Next round..."));
 
     speedMeter.style.width = "0%";
-    speedLabel.textContent = "FALSE START";
+    speedLabel.textContent = outcome === "FS" ? "FALSE START" : "MISSED";
 
     renderHud();
-    Fx.shake(12);
-    Fx.flash(0.3, "#ef4444");
-    play("fail");
-    vibrate([80, 40, 80]);
-
-    schedule(() => beginRound(true), FALSE_START_MS);
+    advanceSolo(FALSE_START_MS);
 }
 
 /* ---------- Duel ---------- */
@@ -840,10 +910,12 @@ function duelPress(side, ts) {
         return;
     }
 
-    if (state === "ready") {
-        const reaction = Math.round(ts - startTime);
+    if (state === "ready" || state === "signal") {
+        const reaction = state === "signal" ? 0 : Math.round(ts - startTime);
 
-        if (reaction < ANTICIPATION_MS) {
+        if (reaction >= RESPONSE_MS) {
+            missRound();
+        } else if (reaction < ANTICIPATION_MS) {
             duelPoint(other, null, "Player " + side + " guessed too early!");
         } else {
             duelPoint(side, reaction, reaction + " ms");
@@ -853,6 +925,7 @@ function duelPress(side, ts) {
 
 function duelPoint(winner, reaction, note) {
     cancelAll();
+    playPressSound(reaction !== null);
 
     duel["p" + winner]++;
     duel.rounds.push({ winner, time: reaction });
@@ -870,27 +943,24 @@ function duelPoint(winner, reaction, note) {
     setArea(reaction !== null ? "" : "too-early");
     setIcon(reaction !== null ? "🏁" : "✖");
     setMessage("PLAYER " + winner + " SCORES!", note);
-    setProgress(Math.max(duel.p1, duel.p2) / DUEL_WINS);
     renderHud();
 
     if (reaction !== null) {
         Fx.impact({ point: Fx.halfPoint(winner), reaction, tier: tierFor(reaction), style: "ring" });
-        if (theme === "samurai") Fx.slashHalf(winner === 1 ? 2 : 1, "#e11d48");
+        if (T().impact === "slash") Fx.slashHalf(winner === 1 ? 2 : 1, T().style.accent);
         Fx.freeze(HIT_STOP_MS);
-        play("thud");
-        play("hit");
     } else {
         Fx.shake(12);
         Fx.flash(0.3, "#ef4444");
-        play("fail");
         vibrate([80, 40, 80]);
     }
 
-    if (duel.p1 >= DUEL_WINS || duel.p2 >= DUEL_WINS) {
-        schedule(showDuelResults, 1200);
-    } else {
-        schedule(beginRound, 1600);
-    }
+    advanceDuel(1600);
+}
+
+function advanceDuel(delay) {
+    setProgress(round / roundLimit);
+    schedule(round >= roundLimit ? showDuelResults : beginRound, delay);
 }
 
 /* ---------- Results ---------- */
@@ -959,6 +1029,41 @@ function revealResults() {
 
 function showResults() {
     state = "finished";
+    setGameActive(false);
+
+    const bars = attempts.map(({ time, outcome }, index) => ({
+        label: "R" + (index + 1),
+        value: time,
+        text: time === null ? outcome : String(time),
+        title: "Round " + (index + 1) + ": " + (time !== null ? time + " ms" : outcome === "FS" ? "False start" : "Missed")
+    }));
+    const failures = [["FALSE STARTS", String(falseStarts)], ["MISSED", String(misses)]];
+    if (mode === "gonogo") failures.push(["DECOYS DODGED", String(decoysDodged)]);
+
+    barsTitle.textContent = "ROUND PERFORMANCE";
+    renderBars(bars);
+    if (!times.length) {
+        resultIcon.textContent = "";
+        resultLabel.textContent = MODES[mode].label;
+        finalScore.textContent = "--";
+        finalRating.textContent = "NO VALID REACTIONS";
+        finalDescription.textContent = "All rounds are complete. Try again to set a reaction time.";
+        recordBadge.hidden = true;
+        rankBox.hidden = true;
+        vizEl.hidden = true;
+        renderGrid(failures);
+        renderRecent();
+        lastResult = {
+            text: "I finished a Split Second challenge with no valid reactions.",
+            card: {
+                modeLabel: MODES[mode].short, big: "--", unit: "", sub: "NO VALID REACTIONS",
+                rank: null, color: "#94a3b8", stats: failures, bars: bars.map(({ value }) => ({ value: value || 0 }))
+            }
+        };
+        revealResults();
+        announce("Challenge complete. No valid reactions.");
+        return;
+    }
 
     const average = Math.round(mean(times));
     const fastest = Math.min(...times);
@@ -966,10 +1071,11 @@ function showResults() {
     const percent = percentFaster(average);
 
     const previousBest = store.bestAvg[mode];
-    const brokeAverage = typeof previousBest === "number" && average < previousBest;
+    const complete = times.length === roundLimit;
+    const brokeAverage = complete && typeof previousBest === "number" && average < previousBest;
     const brokeSingle = runStartBest !== null && fastest < runStartBest;
 
-    if (typeof previousBest !== "number" || average < previousBest) {
+    if (complete && (typeof previousBest !== "number" || brokeAverage)) {
         store.bestAvg[mode] = average;
     }
 
@@ -977,7 +1083,7 @@ function showResults() {
     store.history.length = Math.min(store.history.length, 20);
 
     // Bonus XP for finishing, and for a clean run.
-    awardXp(50 + (falseStarts === 0 ? 25 : 0));
+    awardXp(50 + (complete ? 25 : 0));
     saveStore();
 
     resultIcon.textContent = tier.icon;
@@ -1001,22 +1107,10 @@ function showResults() {
         ["AVERAGE", average + " ms"],
         ["FASTEST", fastest + " ms"],
         ["CONSISTENCY", consistencyScore(times) + "%"],
-        ["FALSE STARTS", String(falseStarts)]
+        ...failures
     ];
 
-    if (mode === "gonogo") {
-        grid.push(["DECOYS DODGED", String(decoysDodged)]);
-    }
-
     renderGrid(grid);
-
-    barsTitle.textContent = "ROUND PERFORMANCE";
-    renderBars(times.map((time, index) => ({
-        label: "R" + (index + 1),
-        value: time,
-        text: String(time),
-        title: "Round " + (index + 1) + ": " + time + " ms"
-    })));
 
     renderRecent();
 
@@ -1031,7 +1125,7 @@ function showResults() {
             rank: tier.rank,
             color: tier.color,
             stats: [["FASTEST", fastest + " ms"], ["CONSISTENCY", consistencyScore(times) + "%"], ["FASTER THAN", percent + "%"]],
-            bars: times.map((time) => ({ value: time }))
+            bars: bars.map(({ value }) => ({ value: value || 0 }))
         }
     };
 
@@ -1041,11 +1135,9 @@ function showResults() {
     // The rank "stamps" onto the screen once the number has counted up.
     stampTimer = setTimeout(() => {
         Viz.stamp(tier.rank);
-        play("thud");
 
         if (tier.rank === "S" || tier.rank === "A" || brokeAverage || brokeSingle) {
             Fx.burst(36, [tier.color, "#ffffff", "#f472b6"]);
-            play("win");
         }
     }, reducedMotion ? 0 : 900);
 
@@ -1056,18 +1148,22 @@ function showResults() {
 
 function showDuelResults() {
     state = "finished";
+    setGameActive(false);
 
-    const winner = duel.p1 > duel.p2 ? 1 : 2;
-    const loserScore = winner === 1 ? duel.p2 : duel.p1;
+    const winner = duel.p1 === duel.p2 ? null : duel.p1 > duel.p2 ? 1 : 2;
+    const score = duel.p1 + " - " + duel.p2;
+    const headline = winner ? "PLAYER " + winner : "DRAW";
+    const outcome = winner ? "WINS " + Math.max(duel.p1, duel.p2) + " - " + Math.min(duel.p1, duel.p2) : score;
+    const summary = winner ? "Player " + winner + " wins the Split Second duel." : "The Split Second duel ended in a draw.";
     const fastest = times.length ? Math.min(...times) : null;
 
     resultIcon.textContent = "🏆";
     resultLabel.textContent = MODES.duel.label;
-    finalScore.textContent = "PLAYER " + winner;
-    finalRating.textContent = "WINS " + duel["p" + winner] + " - " + loserScore;
+    finalScore.textContent = headline;
+    finalRating.textContent = outcome;
     finalDescription.textContent = fastest !== null
         ? "Fastest winning reaction: " + fastest + " ms."
-        : "Won on false starts - nobody was fast enough!";
+        : "No valid reactions were recorded.";
 
     recordBadge.hidden = true;
     rankBox.hidden = true;
@@ -1084,20 +1180,20 @@ function showDuelResults() {
     renderBars(duel.rounds.map((entry, index) => ({
         label: "R" + (index + 1),
         value: entry.time || 0,
-        text: entry.time ? String(entry.time) : "FS",
-        title: "Round " + (index + 1) + ": Player " + entry.winner
-            + (entry.time ? " (" + entry.time + " ms)" : " (opponent false start)"),
-        cls: entry.winner === 1 ? "p1" : "p2"
+        text: entry.time ? String(entry.time) : entry.winner ? "FS" : "MISS",
+        title: "Round " + (index + 1) + ": " + (entry.winner
+            ? "Player " + entry.winner + (entry.time ? " (" + entry.time + " ms)" : " (opponent false start)")
+            : "Neither player reacted"),
+        cls: entry.winner ? "p" + entry.winner : ""
     })));
 
     lastResult = {
-        text: "Player " + winner + " won a Split Second duel "
-            + duel.p1 + "-" + duel.p2 + " ⚡ Think you're faster?",
+        text: summary + " Score: " + score,
         card: {
             modeLabel: "2-Player Duel",
-            big: "PLAYER " + winner,
+            big: headline,
             unit: "",
-            sub: "WINS " + duel["p" + winner] + " - " + loserScore,
+            sub: outcome,
             rank: null,
             color: "#fbbf24",
             stats: [["PLAYER 1", String(duel.p1)], ["PLAYER 2", String(duel.p2)], ["FASTEST", fastest !== null ? fastest + " ms" : "--"]],
@@ -1106,9 +1202,8 @@ function showDuelResults() {
     };
 
     Fx.burst(40);
-    play("win");
     revealResults();
-    announce("Player " + winner + " wins the duel " + duel.p1 + " to " + duel.p2 + ".");
+    announce(summary + " " + score);
 }
 
 /* ---------- Share and save ---------- */
@@ -1201,6 +1296,8 @@ document.addEventListener("keydown", (event) => {
     }
 
     if (isSpace || isEnterOnArea) {
+        if (event.target instanceof Element && event.target.closest("select")) return;
+
         const onControl = event.target instanceof Element &&
             event.target.closest("button, a, input, select, textarea");
 
@@ -1238,27 +1335,14 @@ soundButton.addEventListener("click", () => {
     store.muted = !store.muted;
     saveStore();
     renderSoundButton();
-    play("hit");
 });
 
 modeButtons.forEach((button) => {
     button.addEventListener("click", () => setMode(button.dataset.mode));
 });
 
-themeButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        const id = button.dataset.theme;
-        const info = THEMES[id];
-
-        if (levelOf(store.xp) < info.level) {
-            toast("Reach level " + info.level + " to unlock the " + info.name + " theme");
-            return;
-        }
-
-        applyTheme(id);
-        toast(info.name + " theme");
-    });
-});
+themeSelect.addEventListener("change", () => applyTheme(themeSelect.value));
+roundSelect.addEventListener("change", () => setRoundLimit(Number(roundSelect.value)));
 
 // If the tab is hidden mid-round the player cannot see the signal, so
 // that round is restarted when they come back.
@@ -1281,12 +1365,12 @@ document.addEventListener("visibilitychange", () => {
 
 /* ---------- Start ---------- */
 
+for (const [id, config] of Object.entries(THEMES)) {
+    themeSelect.add(new Option(config.name, id));
+}
+roundSelect.value = String(roundLimit);
 Fx.init();
 renderSoundButton();
 applyTheme(theme);
 renderXp();
 setMode(mode);
-
-if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-}
