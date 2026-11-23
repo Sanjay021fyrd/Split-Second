@@ -40,6 +40,7 @@ const assets = new Map([
     ["/fx.js", ["fx.js", "text/javascript", true]],
     ["/viz.js", ["viz.js", "text/javascript", true]],
     ["/script.js", ["script.js", "text/javascript", true]],
+    ["/atlantis.jpg", ["atlantis.jpg", "image/jpeg", false]],
     ["/icon.svg", ["icon.svg", "image/svg+xml", false]],
     ["/coastal.svg", ["coastal.svg", "image/svg+xml", false]],
     ["/ruins.svg", ["ruins.svg", "image/svg+xml", false]],

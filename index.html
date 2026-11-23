@@ -4,22 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Split Second - a reaction-time game with Lights Out, Classic, Go / No-Go and 2-player Duel modes, themes and animations.">
-    <meta name="theme-color" content="#eef4d9" id="meta-theme">
+    <meta name="theme-color" content="#061723" id="meta-theme">
     <title>Split Second | Reaction Time Game</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="atlantis-signin">
 
 <canvas id="ambient" class="ambient" aria-hidden="true"></canvas>
 
-<section class="auth-panel" aria-labelledby="sign-in-title">
+<section class="auth-panel sign-in-shell" aria-label="Split Second account">
     <div id="login-panel">
-        <h1 id="sign-in-title">Split Second</h1>
-        <p>Sign in to play the reaction time challenge.</p>
-        <a id="google-login" class="auth-button" href="/auth/google" hidden>Sign in with Google</a>
+        <div class="atlantis-scene" aria-hidden="true"></div>
+        <div class="atlantis-content">
+            <div class="atlantis-mark"><span aria-hidden="true">⚡</span> Reaction time game</div>
+            <h1 id="sign-in-title">Split <span>Second</span></h1>
+            <p>Wait for the signal. React in a split second.</p>
+            <a id="google-login" class="auth-button atlantis-cta" href="/auth/google" hidden>
+                <span>Sign in with Google</span><span aria-hidden="true">↗</span>
+            </a>
+            <details class="atlantis-instructions">
+                <summary>How to play</summary>
+                <p>Click, tap, or press Space when the signal turns green. Play solo, climb the weekly leaderboard, or challenge a friend to a duel.</p>
+            </details>
+        </div>
     </div>
     <div id="account-panel" hidden>
         <strong id="account-name"></strong>
