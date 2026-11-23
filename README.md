@@ -59,9 +59,3 @@ manifest.webmanifest  PWA manifest
 icon.svg              app icon
 ```
 
-## Ideas for later
-
-- Target-click (aim trainer) and sequence-memory modes
-- Daily challenge with a streak
-- Online leaderboard (Firebase / Supabase)
-- Achievements and badges
