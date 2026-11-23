@@ -98,7 +98,7 @@ Split-Second/
 
 
 Created by T.M. Sanjay Kumar
-[GitHub](https://github.com/sanjay021fyrd) · [LinkedIn](www.linkedin.com/in/sanjay-kumar-tm)
+[GitHub](https://github.com/sanjay021fyrd) · [LinkedIn](https://www.linkedin.com/in/sanjay-kumar-tm/)
 
 
 MIT License
