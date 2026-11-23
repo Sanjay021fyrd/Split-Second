@@ -1,92 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="neon">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaction Master V6</title>
+    <meta name="description" content="Split Second - a reaction-time game with Lights Out, Classic, Go / No-Go and 2-player Duel modes, themes and animations.">
+    <meta name="theme-color" content="#050816" id="meta-theme">
+    <title>Split Second | Reaction Time Game</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+<canvas id="ambient" class="ambient" aria-hidden="true"></canvas>
+
 <main class="game-container">
 
     <header class="game-header">
         <div class="brand">
-            <div class="brand-icon">⚡</div>
+            <div class="brand-icon" aria-hidden="true">⚡</div>
             <div>
-                <h1>Reaction Master</h1>
-                <p>Competitive Reflex Challenge</p>
+                <h1>Split Second</h1>
+                <p>Reaction time challenge</p>
             </div>
         </div>
 
-        <div class="live-status">
-            <span class="status-dot"></span>
-            LIVE
+        <div class="header-tools">
+
+            <div class="xp" title="Play to earn XP and unlock themes">
+                <span id="level" class="level">LV 1</span>
+                <div class="xp-track" aria-hidden="true"><i id="xp-fill"></i></div>
+                <small id="xp-text">0 / 250 XP</small>
+            </div>
+
+            <div id="themes" class="themes" role="group" aria-label="Theme">
+                <button class="theme-btn" type="button" data-theme="neon" aria-pressed="true" title="Neon Arcade"></button>
+                <button class="theme-btn" type="button" data-theme="samurai" aria-pressed="false" title="Samurai"></button>
+                <button class="theme-btn" type="button" data-theme="space" aria-pressed="false" title="Deep Space"></button>
+            </div>
+
+            <button id="sound-btn" class="icon-btn" type="button"
+                    aria-pressed="true" aria-label="Sound on" title="Sound on / off">🔊</button>
         </div>
     </header>
 
+    <nav id="modes" class="modes" aria-label="Game mode">
+        <span id="mode-pill" class="mode-pill" aria-hidden="true"></span>
+        <button class="mode-btn active" type="button" data-mode="classic" aria-pressed="true">
+            <strong>Classic</strong>
+            <small>5 rounds</small>
+        </button>
+        <button class="mode-btn" type="button" data-mode="lights" aria-pressed="false">
+            <strong>Lights Out</strong>
+            <small>Race start</small>
+        </button>
+        <button class="mode-btn" type="button" data-mode="gonogo" aria-pressed="false">
+            <strong>Go / No-Go</strong>
+            <small>Ignore decoys</small>
+        </button>
+        <button class="mode-btn" type="button" data-mode="duel" aria-pressed="false">
+            <strong>2-Player Duel</strong>
+            <small>First to 3</small>
+        </button>
+    </nav>
+
     <section class="hud">
-        <div class="hud-card">
-            <span>ROUND</span>
+        <div class="hud-card" data-tilt>
+            <span id="hud1-label">ROUND</span>
             <strong id="round">0 / 5</strong>
         </div>
 
-        <div class="hud-card">
-            <span>COMBO</span>
+        <div class="hud-card" data-tilt>
+            <span id="hud2-label">STREAK</span>
             <strong id="combo">0x</strong>
         </div>
 
-        <div class="hud-card">
-            <span>BEST</span>
+        <div class="hud-card" data-tilt>
+            <span id="hud3-label">BEST</span>
             <strong id="best-score">--</strong>
         </div>
     </section>
 
-    <div class="progress-container">
+    <div class="progress-container" aria-hidden="true">
         <div id="progress-bar"></div>
     </div>
 
-    <section id="game-area" class="game-area">
+    <div id="stage" class="stage">
+        <section id="game-area" class="game-area" tabindex="0"
+                 aria-label="Reaction area. Press Space or click when the screen turns green.">
 
-        <div class="game-content">
-
-            <div id="countdown" class="countdown"></div>
-
-            <div id="message" class="message">
-                READY?
+            <div id="duel-sides" class="duel-sides" aria-hidden="true" hidden>
+                <span>PLAYER 1 · Q</span>
+                <span>PLAYER 2 · P</span>
             </div>
 
-            <p id="sub-message" class="sub-message">
-                Test your reflexes
-            </p>
+            <div class="game-content">
 
-            <button id="start-btn" class="start-btn">
-                START CHALLENGE
-            </button>
+                <div id="lights" class="lights" aria-hidden="true" hidden>
+                    <span class="light"></span>
+                    <span class="light"></span>
+                    <span class="light"></span>
+                    <span class="light"></span>
+                    <span class="light"></span>
+                </div>
 
-        </div>
+                <div id="signal-icon" class="signal-icon" aria-hidden="true"></div>
 
-    </section>
+                <div id="message" class="message" aria-live="assertive" aria-atomic="true">
+                    READY?
+                </div>
+
+                <p id="sub-message" class="sub-message">
+                    Test your reflexes
+                </p>
+
+                <button id="start-btn" class="start-btn" type="button">
+                    START CHALLENGE
+                </button>
+
+            </div>
+
+            <div id="fx" class="fx" aria-hidden="true"></div>
+
+        </section>
+    </div>
 
     <section class="stats">
 
-        <div class="stat-card">
+        <div class="stat-card" data-tilt>
             <span>LAST</span>
             <strong id="current-score">--</strong>
             <small>reaction time</small>
         </div>
 
-        <div class="stat-card featured">
+        <div class="stat-card featured" data-tilt>
             <span>AVERAGE</span>
             <strong id="average-score">--</strong>
-            <small>5 round average</small>
+            <small>this run</small>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card" data-tilt>
             <span>FASTEST</span>
             <strong id="fastest-score">--</strong>
-            <small>best this game</small>
+            <small>this run</small>
         </div>
 
     </section>
@@ -106,57 +163,84 @@
 
     <section id="result-panel" class="result-panel">
 
-        <div id="result-icon" class="result-icon">
-            🏆
-        </div>
+        <div id="result-icon" class="result-icon" aria-hidden="true">🏆</div>
 
-        <p class="result-label">
-            CHALLENGE COMPLETE
-        </p>
+        <p id="result-label" class="result-label">CHALLENGE COMPLETE</p>
 
         <h2 id="final-score">--</h2>
 
-        <div id="final-rating" class="final-rating">
-            ELITE
-        </div>
+        <div id="final-rating" class="final-rating">ELITE</div>
 
-        <p id="final-description" class="final-description">
-            Excellent performance
-        </p>
+        <p id="final-description" class="final-description"></p>
 
-        <div class="rank-box">
+        <p id="record-badge" class="record-badge" hidden></p>
+
+        <div id="rank-box" class="rank-box" data-tilt>
             <span>YOUR RANK</span>
             <strong id="final-rank">A</strong>
         </div>
 
-        <div class="result-grid">
+        <div id="viz" class="viz">
 
-            <div>
-                <span>AVERAGE</span>
-                <strong id="final-average">--</strong>
-            </div>
+            <figure class="viz-card" data-tilt>
+                <figcaption>SPEED GAUGE</figcaption>
+                <svg viewBox="0 0 200 125" role="img" aria-label="Speed gauge from slow to fast">
+                    <defs>
+                        <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0" stop-color="#ef4444"/>
+                            <stop offset="0.5" stop-color="#f59e0b"/>
+                            <stop offset="1" stop-color="#22c55e"/>
+                        </linearGradient>
+                    </defs>
+                    <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                    <path id="gauge-arc" class="gauge-arc" pathLength="100" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                    <g id="gauge-needle" class="needle">
+                        <line x1="100" y1="100" x2="100" y2="36"/>
+                        <circle cx="100" cy="100" r="7"/>
+                    </g>
+                    <text x="20" y="118" class="gauge-tick">SLOW</text>
+                    <text x="180" y="118" class="gauge-tick" text-anchor="end">FAST</text>
+                </svg>
+                <div id="gauge-readout" class="gauge-readout">-- ms</div>
+            </figure>
 
-            <div>
-                <span>FASTEST</span>
-                <strong id="final-fastest">--</strong>
-            </div>
-
-            <div>
-                <span>CONSISTENCY</span>
-                <strong id="consistency">--</strong>
-            </div>
+            <figure class="viz-card" data-tilt>
+                <figcaption>HOW YOU COMPARE</figcaption>
+                <svg viewBox="0 0 300 130" role="img" aria-label="Your result on a bell curve of typical players">
+                    <path id="bell-area" class="bell-area"/>
+                    <path id="bell-shade" class="bell-shade"/>
+                    <path id="bell-line" class="bell-line"/>
+                    <line x1="0" y1="108" x2="300" y2="108" class="bell-base"/>
+                    <text x="2" y="124" class="gauge-tick">130 ms</text>
+                    <text x="298" y="124" class="gauge-tick" text-anchor="end">420 ms</text>
+                    <g id="bell-marker">
+                        <g id="bell-drop">
+                            <line id="bell-stem" x1="0" y1="0" x2="0" y2="40" class="bell-stem"/>
+                            <circle r="6.5" class="bell-dot"/>
+                        </g>
+                    </g>
+                </svg>
+                <div id="bell-caption" class="bell-caption">--</div>
+            </figure>
 
         </div>
 
-        <div class="history-title">
-            ROUND PERFORMANCE
-        </div>
+        <div id="result-grid" class="result-grid"></div>
+
+        <div id="bars-title" class="history-title">ROUND PERFORMANCE</div>
 
         <div id="round-bars" class="round-bars"></div>
 
-        <button id="play-again" class="start-btn">
-            PLAY AGAIN
-        </button>
+        <div id="recent" class="recent" hidden>
+            <div class="history-title">RECENT RUNS</div>
+            <ul id="recent-list"></ul>
+        </div>
+
+        <div class="result-actions">
+            <button id="play-again" class="start-btn" type="button">PLAY AGAIN</button>
+            <button id="share-btn" class="ghost-btn" type="button">SHARE</button>
+            <button id="save-btn" class="ghost-btn" type="button">SAVE IMAGE</button>
+        </div>
 
     </section>
 
@@ -164,10 +248,10 @@
 
         <div>
             Controls
-            <strong>CLICK / SPACE</strong>
+            <strong id="controls-hint">CLICK / TAP / SPACE</strong>
         </div>
 
-        <button id="reset-btn" class="reset-btn">
+        <button id="reset-btn" class="reset-btn" type="button">
             Reset
         </button>
 
@@ -175,6 +259,17 @@
 
 </main>
 
+<div id="banner" class="banner" role="status" aria-hidden="true">
+    <strong id="banner-title"></strong>
+    <span id="banner-sub"></span>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="sr-live" class="sr-only" aria-live="polite"></div>
+
+<script src="fx.js"></script>
+<script src="viz.js"></script>
 <script src="script.js"></script>
 
 </body>

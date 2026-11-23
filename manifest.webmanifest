@@ -1,0 +1,14 @@
+{
+  "name": "Split Second",
+  "short_name": "Split Second",
+  "description": "A reaction-time game with Classic, Go / No-Go and 2-player Duel modes.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
