@@ -1542,21 +1542,21 @@ h1 {
     .competition-card:hover, .competition-card:hover .competition-card-action span { transform: none; }
 }
 
-/* The Atlantis entry screen has its own palette and does not use gameplay themes. */
-body.atlantis-signin {
-    --entry-ink: #eafbf9;
-    --entry-muted: #a9d4d5;
-    --entry-accent: #73f1d6;
+/* The Eclipse Observatory entry screen has its own palette and does not use gameplay themes. */
+body.eclipse-signin {
+    --entry-ink: #fff8e8;
+    --entry-muted: #d0c8bf;
+    --entry-accent: #efd29a;
     padding: 0;
     gap: 0;
     min-height: 100svh;
-    background: #04131e;
+    background: #090d1c;
     color: var(--entry-ink);
 }
 
-.atlantis-signin .ambient { display: none; }
+.eclipse-signin .ambient { display: none; }
 
-.atlantis-signin .sign-in-shell {
+.eclipse-signin .sign-in-shell {
     display: grid;
     align-items: center;
     grid-template-columns: minmax(0, 1fr);
@@ -1565,72 +1565,72 @@ body.atlantis-signin {
     padding: 0;
     border-radius: 0;
     isolation: isolate;
-    background: #04131e;
+    background: #090d1c;
 }
 
-.atlantis-signin #login-panel {
+.eclipse-signin #login-panel {
     display: grid;
     align-items: center;
     min-height: 100svh;
 }
 
-.atlantis-scene {
+.eclipse-scene {
     position: absolute;
     z-index: -1;
     inset: 0;
-    background: url("atlantis.jpg") 58% 50% / cover no-repeat,
-        radial-gradient(ellipse at 65% 0%, #187b83, #062d43 46%, #04131e 76%);
+    background: url("eclipse.jpg") 58% 50% / cover no-repeat,
+        radial-gradient(ellipse at 65% 0%, #716253, #242942 46%, #090d1c 76%);
     overflow: hidden;
 }
 
-.atlantis-scene::before,
-.atlantis-scene::after {
+.eclipse-scene::before,
+.eclipse-scene::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
 }
 
-.atlantis-scene::before {
-    background: linear-gradient(90deg, #04131ef5 0%, #04131ee6 25%, #04131e83 49%, transparent 82%),
-        linear-gradient(0deg, #04131ec0, transparent 34%);
+.eclipse-scene::before {
+    background: linear-gradient(90deg, #090d1cf5 0%, #090d1ce6 25%, #090d1c83 49%, transparent 82%),
+        linear-gradient(0deg, #090d1cc0, transparent 34%);
 }
 
-.atlantis-scene::after {
-    background: radial-gradient(ellipse at 71% 12%, #61ffe53b, transparent 48%);
-    animation: atlantis-caustics 10s ease-in-out infinite alternate;
+.eclipse-scene::after {
+    background: radial-gradient(ellipse at 73% 30%, #ffe3a72e, transparent 48%);
+    animation: eclipse-caustics 10s ease-in-out infinite alternate;
 }
 
-@keyframes atlantis-caustics {
+@keyframes eclipse-caustics {
     from { opacity: .25; }
     to { opacity: .9; }
 }
 
-.atlantis-content {
+.eclipse-content {
     position: relative;
     width: min(100%, 620px);
     padding: clamp(32px, 7vw, 112px);
     padding-right: 30px;
-    animation: atlantis-enter .65s ease-out both;
+    animation: eclipse-enter .65s ease-out both;
 }
 
-@keyframes atlantis-enter {
+@keyframes eclipse-enter {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.atlantis-content h1 {
+.eclipse-content h1 {
     margin: 0;
     font: 900 clamp(3.6rem, 8.5vw, 8rem)/.83 system-ui, sans-serif;
     letter-spacing: -.075em;
 }
 
-.atlantis-content h1 span {
+.eclipse-content h1 span {
     display: block;
     color: var(--entry-accent);
 }
 
-.atlantis-content > p {
+.eclipse-content > p {
     max-width: 29ch;
     margin: 22px 0 26px;
     color: var(--entry-muted);
@@ -1638,7 +1638,7 @@ body.atlantis-signin {
     line-height: 1.55;
 }
 
-.atlantis-content .atlantis-cta {
+.eclipse-content .eclipse-cta {
     display: inline-flex;
     justify-content: space-between;
     align-items: center;
@@ -1648,18 +1648,18 @@ body.atlantis-signin {
     border: 1px solid transparent;
     border-radius: 12px;
     background: var(--entry-accent);
-    color: #05242b;
+    color: #231b14;
     font-weight: 800;
-    box-shadow: 0 6px 24px #27dacb35;
+    box-shadow: 0 6px 24px #e9bf6635;
     transition: background-color .2s ease, box-shadow .2s ease;
 }
 
-.atlantis-content .atlantis-cta:hover {
-    background: #acffe9;
-    box-shadow: 0 8px 32px #27dacb55;
+.eclipse-content .eclipse-cta:hover {
+    background: #fff0ca;
+    box-shadow: 0 8px 32px #e9bf6655;
 }
 
-.atlantis-instructions {
+.eclipse-instructions {
     margin-top: 20px;
     max-width: 36ch;
     color: var(--entry-muted);
@@ -1667,23 +1667,23 @@ body.atlantis-signin {
     line-height: 1.55;
 }
 
-.atlantis-instructions summary {
+.eclipse-instructions summary {
     width: fit-content;
     color: var(--entry-ink);
     cursor: pointer;
 }
 
-.atlantis-instructions[open] p {
+.eclipse-instructions[open] p {
     margin: 8px 0 0;
-    animation: atlantis-enter .2s ease-out both;
+    animation: eclipse-enter .2s ease-out both;
 }
 
-.atlantis-content :is(a, summary):focus-visible {
+.eclipse-content :is(a, summary):focus-visible {
     outline: 2px solid #fff;
     outline-offset: 5px;
 }
 
-.atlantis-signin #auth-status {
+.eclipse-signin #auth-status {
     position: absolute;
     inset: auto clamp(32px, 7vw, 112px) 20px;
     width: fit-content;
@@ -1691,16 +1691,16 @@ body.atlantis-signin {
     margin: 0;
     padding: 8px 12px;
     border-radius: 9px;
-    background: #052331;
+    background: #1a2034;
     color: var(--entry-ink);
 }
 
 @media (max-width: 620px) {
-    .atlantis-scene { background-position: 60% top; }
-    .atlantis-scene::before {
-        background: linear-gradient(0deg, #04131e 5%, #04131ee8 38%, #04131e32 100%);
+    .eclipse-scene { background-position: 60% top; }
+    .eclipse-scene::before {
+        background: linear-gradient(0deg, #090d1c 5%, #090d1ce8 38%, #090d1c32 100%);
     }
-    .atlantis-signin #login-panel { align-items: end; }
-    .atlantis-content { padding: 32vh 24px 72px; }
-    .atlantis-signin #auth-status { inset-inline: 24px; }
+    .eclipse-signin #login-panel { align-items: end; }
+    .eclipse-content { padding: 32vh 24px 72px; }
+    .eclipse-signin #auth-status { inset-inline: 24px; }
 }

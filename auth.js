@@ -55,7 +55,7 @@ async function loadSession() {
 
         document.getElementById("account-name").textContent = user.name;
         document.getElementById("account-email").textContent = user.email;
-        document.body.classList.remove("atlantis-signin");
+        document.body.classList.remove("eclipse-signin");
         document.getElementById("login-panel").hidden = true;
         document.getElementById("account-panel").hidden = false;
         statusText.textContent = "Loading the game…";
