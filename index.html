@@ -55,14 +55,14 @@
             <button id="competition-weekly" class="competition-card" type="button">
                 <span class="competition-icon" aria-hidden="true">&#8599;</span>
                 <span class="competition-card-title">Weekly ranked</span>
-                <span class="competition-card-meta">5 rounds &middot; Best median time</span>
+                <span class="competition-card-meta">5 rounds &middot; Best run counts</span>
                 <span class="competition-card-action">Start ranked run <span aria-hidden="true">&rarr;</span></span>
             </button>
             <button id="competition-daily" class="competition-card" type="button">
                 <span class="competition-icon" aria-hidden="true">&#9728;</span>
                 <span class="competition-card-title">Daily challenge</span>
-                <span class="competition-card-meta">3 rounds &middot; Resets at 00:00 UTC</span>
-                <span class="competition-card-action">Play today <span aria-hidden="true">&rarr;</span></span>
+                <span class="competition-card-meta">3 rounds &middot; One attempt per day</span>
+                <span id="competition-daily-action" class="competition-card-action">Play today <span aria-hidden="true">&rarr;</span></span>
             </button>
             <button id="competition-create" class="competition-card" type="button">
                 <span class="competition-icon" aria-hidden="true">&#8644;</span>
@@ -72,6 +72,11 @@
             </button>
         </div>
 
+        <p id="competition-daily-targets" role="status">Daily badges require three valid reactions. Starting uses today's attempt.</p>
+        <details>
+            <summary>How Weekly Ranked works</summary>
+            <p>Play five rounds and record a valid reaction in each. Your score is the middle time when all five are sorted from fastest to slowest. You can replay, and only your fastest score counts toward the weekly leaderboard. The board resets Monday at 00:00 UTC.</p>
+        </details>
         <form id="competition-join">
             <label for="competition-room">Have a room code?</label>
             <div class="competition-join-fields">
@@ -366,6 +371,16 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <div id="sr-live" class="sr-only" aria-live="polite"></div>
+
+<dialog id="exit-run-dialog" class="exit-run-dialog" role="alertdialog"
+        aria-labelledby="exit-run-title" aria-describedby="exit-run-message">
+    <h2 id="exit-run-title">Leave this run?</h2>
+    <p id="exit-run-message"></p>
+    <form method="dialog">
+        <button class="auth-button" value="stay" autofocus>Keep playing</button>
+        <button class="auth-button exit-run-confirm" value="leave">Leave run</button>
+    </form>
+</dialog>
 
 <script src="auth.js" defer></script>
 

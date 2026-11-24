@@ -18,6 +18,24 @@
     let sent = false;
     let loading = false;
     let dailyCard = null;
+    const dailyButton = element("competition-daily");
+    let dailyStatusRequest = 0;
+
+    async function refreshDaily() {
+        const token = ++dailyStatusRequest;
+        try {
+            const data = await api("daily-status", {});
+            if (token !== dailyStatusRequest) return;
+            dailyButton.disabled = data.played;
+            element("competition-daily-action").textContent = data.played ? "Attempt used" : "Play today";
+            const targets = data.rewards.map(({ name, target }) => name + " under " + target + " ms").join(" • ");
+            element("competition-daily-targets").textContent =
+                (data.played ? "Next attempt at 00:00 UTC. " : "Starting uses today's attempt. ") +
+                "Daily badges by median (3 valid rounds): " + targets + ".";
+        } catch {
+            // The server still enforces the limit when a run starts.
+        }
+    }
 
     async function api(route, params, method = "GET") {
         const response = await fetch("/competition/" + route + "?" + new URLSearchParams(params), {
@@ -39,6 +57,7 @@
         cancelAnimationFrame(frame);
         shownAt = 0;
         snapshot = null;
+        competitionRun = null;
         sent = false;
     }
 
@@ -48,7 +67,7 @@
         dailyCard = null;
         element("competition-share").hidden = true;
         const game = element("game");
-        if (!game.hidden) element("reset-btn").click();
+        if (!game.hidden) resetValues();
         panel.dataset.playing = "true";
         game.hidden = true;
         arena.hidden = false;
@@ -67,6 +86,7 @@
         guest = true;
         code = "";
         openArena();
+        competitionRun = "practice";
         status.textContent = "Practice • 1 round";
         timer = setTimeout(() => {
             showSignal("CLICK!", "go");
@@ -100,9 +120,9 @@
             const mode = element("competition-board-mode").value;
             const data = await api("leaderboard", { mode });
             if (mode !== element("competition-board-mode").value) return;
-            board.replaceChildren(...data.rows.map(({ name, score }) => {
+            board.replaceChildren(...data.rows.map(({ name, score, reward }) => {
                 const row = document.createElement("li");
-                row.textContent = name + " · " + score + " ms";
+                row.textContent = name + " · " + score + " ms" + (reward ? " · " + reward : "");
                 return row;
             }));
             element("competition-board-note").textContent = (mode === "daily" ? "UTC date " : "Week starting ") +
@@ -128,11 +148,14 @@
             status.textContent = summary;
             if (state.mode === "daily") {
                 const share = element("competition-share");
+                const badge = state.dailyReward?.name;
+                if (badge) status.textContent += " · " + badge + " badge earned";
+                else if (state.results.every((row) => row.times[state.seat])) status.textContent += " · No badge earned";
                 const times = state.results.map((row) => row.times[state.seat]);
                 const valid = times.filter(Boolean);
                 dailyCard = {
                     modeLabel: "DAILY CHALLENGE", big: valid.length === times.length ? summary.match(/\d+/)[0] : "COMPLETE",
-                    unit: valid.length === times.length ? "ms" : "", sub: "3-ROUND CLASSIC", rank: null, color: "#72ba57",
+                    unit: valid.length === times.length ? "ms" : "", sub: badge || "3-ROUND CLASSIC", rank: null, color: "#72ba57",
                     stats: [["VALID ROUNDS", valid.length + " / " + times.length]],
                     bars: times.map((time) => ({ value: time || 0 }))
                 };
@@ -183,6 +206,7 @@
         guest = false;
         openArena();
         const token = generation;
+        competitionRun = params.mode || "duel";
         status.textContent = "Connecting…";
         try {
             const state = await api(route, params, "POST");
@@ -195,10 +219,14 @@
             watch(token);
         } catch (error) {
             if (token === generation) {
+                competitionRun = null;
                 showSignal("UNAVAILABLE", "finished");
                 status.textContent = error.message;
             }
-        } finally { loading = false; }
+        } finally {
+            loading = false;
+            if (params.mode === "daily") refreshDaily();
+        }
     }
 
     async function press() {
@@ -225,13 +253,14 @@
         } finally { loading = false; }
     }
 
-    element("competition-practice").addEventListener("click", startGuest);
-    element("competition-weekly").addEventListener("click", () => startOnline("create", { mode: "ranked" }));
-    element("competition-daily").addEventListener("click", () => startOnline("create", { mode: "daily" }));
-    element("competition-create").addEventListener("click", () => startOnline("create", { mode: "duel" }));
+    element("competition-practice").addEventListener("click", () => confirmRunExit(startGuest));
+    element("competition-weekly").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "ranked" })));
+    dailyButton.addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "daily" })));
+    element("competition-create").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "duel" })));
     element("competition-join").addEventListener("submit", (event) => {
         event.preventDefault();
-        startOnline("join", { code: element("competition-room").value.trim() });
+        const room = element("competition-room").value.trim();
+        confirmRunExit(() => startOnline("join", { code: room }));
     });
     signal.addEventListener("click", press);
     signal.addEventListener("pointerdown", (event) => {
@@ -240,7 +269,7 @@
         press();
     });
     signal.addEventListener("click", (event) => { if (event.detail !== 0) event.stopImmediatePropagation(); }, true);
-    element("competition-back").addEventListener("click", () => {
+    element("competition-back").addEventListener("click", () => confirmRunExit(() => {
         const former = code;
         stop();
         code = "";
@@ -250,7 +279,8 @@
         element("competition-share").hidden = true;
         element("game").hidden = !panel.dataset.signedIn;
         if (former) api("leave", { code: former }, "POST").catch(() => {});
-    });
+        refreshDaily();
+    }));
     element("competition-share").addEventListener("click", async () => {
         if (!dailyCard) return;
         try {
@@ -273,4 +303,7 @@
     });
     element("competition-board-mode").addEventListener("change", refreshBoard);
     refreshBoard();
+    refreshDaily();
+    window.addEventListener("focus", refreshDaily);
+    setInterval(refreshDaily, 60000);
 })();

@@ -79,17 +79,53 @@ window.addEventListener("pageshow", (event) => {
     if (event.persisted) location.reload();
 });
 
-logout.addEventListener("click", async () => {
+const exitRunDialog = document.getElementById("exit-run-dialog");
+let confirmExit;
+let competitionRun = null;
+let signingOut = false;
+
+function activeRunWarning() {
+    if (competitionRun === "daily") return "Your Daily Challenge attempt is already used. You can try again at 00:00 UTC.";
+    if (competitionRun === "duel") return "Leaving ends the duel for both players.";
+    if (competitionRun || (typeof isGameActive !== "undefined" && isGameActive)) {
+        return "Your progress in this run will be lost.";
+    }
+    return "";
+}
+
+function confirmRunExit(action, warning = activeRunWarning()) {
+    if (exitRunDialog.open || confirmExit) return;
+    if (!warning) return action();
+    confirmExit = action;
+    exitRunDialog.returnValue = "stay";
+    document.getElementById("exit-run-message").textContent = warning;
+    exitRunDialog.showModal();
+}
+
+exitRunDialog.addEventListener("close", () => {
+    const action = confirmExit;
+    confirmExit = undefined;
+    if (exitRunDialog.returnValue === "leave") action?.();
+});
+
+window.addEventListener("beforeunload", (event) => {
+    if (signingOut || !activeRunWarning()) return;
+    event.preventDefault();
+    event.returnValue = "";
+});
+
+logout.addEventListener("click", () => confirmRunExit(async () => {
     logout.disabled = true;
     statusText.textContent = "Signing out…";
     try {
         const response = await fetch("/auth/logout", { method: "POST" });
         if (!response.ok) throw new Error("Logout failed");
+        signingOut = true;
         location.replace("/");
     } catch {
         logout.disabled = false;
         statusText.textContent = "Could not sign out. Try again.";
     }
-});
+}));
 
 loadSession();

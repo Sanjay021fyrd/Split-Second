@@ -1449,12 +1449,12 @@ h1 {
 .competition-card-action span { transition: transform .18s ease; }
 
 @media (hover: hover) {
-    .competition-card:hover {
+    .competition-card:enabled:hover {
         transform: translateY(-3px);
         border-color: var(--accent);
         box-shadow: 0 8px 16px rgba(var(--accent-rgb), .16);
     }
-    .competition-card:hover .competition-card-action span { transform: translateX(3px); }
+    .competition-card:enabled:hover .competition-card-action span { transform: translateX(3px); }
 }
 
 #competition :is(button, input, select, summary):focus-visible {
@@ -1501,11 +1501,11 @@ h1 {
 }
 
 .competition-board-content { padding: 0 12px 12px; }
-.competition-leaderboards[open] .competition-board-content { animation: competition-in .2s ease-out both; }
+
 #competition ol { margin: 8px 0 12px 26px; }
 #competition-board li, #competition-results li { padding: 4px 0; }
 #competition[data-playing] .competition-menu { display: none; }
-#competition-arena { animation: competition-in .22s ease-out both; }
+
 
 #competition-signal {
     display: block;
@@ -1539,7 +1539,93 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .competition-card:hover, .competition-card:hover .competition-card-action span { transform: none; }
+    .competition-card:enabled:hover, .competition-card:enabled:hover .competition-card-action span { transform: none; }
+}
+
+.competition-card:disabled {
+    opacity: 0.65;
+    cursor: default;
+    transform: none;
+}
+
+#competition-daily-targets {
+    margin-block: 0.8rem;
+    line-height: 1.5;
+}
+
+.competition-menu details summary {
+    cursor: pointer;
+}
+
+/* Motion is limited to navigation and post-run feedback. */
+@media (prefers-reduced-motion: no-preference) {
+    #competition-members > .competition-card,
+    .competition-menu details[open] > p,
+    .competition-leaderboards[open] .competition-board-content,
+    #competition-board > li,
+    #competition-results > li,
+    #competition-share:not([hidden]) {
+        animation: competition-in 190ms ease-out backwards;
+    }
+
+    #competition-members > .competition-card:nth-child(2),
+    #competition-board > li:nth-child(2),
+    #competition-results > li:nth-child(2) {
+        animation-delay: 30ms;
+    }
+
+    #competition-members > .competition-card:nth-child(3),
+    #competition-board > li:nth-child(3),
+    #competition-results > li:nth-child(3) {
+        animation-delay: 60ms;
+    }
+
+    #competition-members > .competition-card:nth-child(n+4),
+    #competition-board > li:nth-child(n+4),
+    #competition-results > li:nth-child(n+4),
+    #competition-share:not([hidden]) {
+        animation-delay: 90ms;
+    }
+
+    .competition-card:enabled:active {
+        transform: translateY(1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .competition-card, .competition-card-action span {
+        transition: none;
+    }
+}
+.exit-run-dialog {
+    width: min(420px, calc(100% - 32px));
+    padding: 24px;
+    border: 1px solid rgba(var(--accent-rgb), .4);
+    border-radius: 16px;
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 20px 60px #0006;
+}
+
+.exit-run-dialog::backdrop { background: #0009; }
+.exit-run-dialog h2 { margin: 0 0 8px; }
+.exit-run-dialog p { margin: 0 0 20px; line-height: 1.5; }
+
+.exit-run-dialog form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.exit-run-dialog .exit-run-confirm {
+    background: #9b2c2c;
+    color: #fff;
+    border-color: #9b2c2c;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .exit-run-dialog[open] { animation: competition-in 150ms ease-out; }
 }
 
 /* The Eclipse Observatory entry screen has its own palette and does not use gameplay themes. */

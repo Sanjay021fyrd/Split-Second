@@ -1284,6 +1284,7 @@ gameArea.addEventListener("pointerdown", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+    if (exitRunDialog.open) return;
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
     const isSpace = event.code === "Space";
@@ -1327,7 +1328,7 @@ document.addEventListener("keydown", (event) => {
 
 startButton.addEventListener("click", startChallenge);
 playAgain.addEventListener("click", startChallenge);
-resetButton.addEventListener("click", resetValues);
+resetButton.addEventListener("click", () => confirmRunExit(resetValues));
 shareButton.addEventListener("click", shareResult);
 saveButton.addEventListener("click", saveImage);
 

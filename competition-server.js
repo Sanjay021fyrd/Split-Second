@@ -1,7 +1,7 @@
 "use strict";
 
-const { randomBytes, randomInt } = require("node:crypto");
-const { mkdir, readFile, writeFile, rename } = require("node:fs/promises");
+const { createHash, randomBytes, randomInt } = require("node:crypto");
+const { mkdir, readFile, writeFile, rename, stat } = require("node:fs/promises");
 const { join } = require("node:path");
 
 module.exports = function createCompetition(profileDirectory) {
@@ -18,6 +18,25 @@ module.exports = function createCompetition(profileDirectory) {
     const median = (times) => [...times].sort((a, b) => a - b)[Math.floor(times.length / 2)];
     const period = (mode) => mode === "daily" ? day() : week();
 
+    const rewards = [
+        { name: "Lightning", target: 200 },
+        { name: "Quickdraw", target: 250 },
+        { name: "Sharp Reflexes", target: 320 }
+    ];
+    const rewardFor = (score) => rewards.find(({ target }) => score < target) ?? null;
+    const dailyAttempt = (date, id) => join(profileDirectory, "daily-attempts", date,
+        createHash("sha256").update(id).digest("hex"));
+
+    async function hasPlayedDaily(date, id) {
+        try {
+            await stat(dailyAttempt(date, id));
+            return true;
+        } catch (error) {
+            if (error.code !== "ENOENT") throw error;
+        }
+        return (await readScores()).some((row) => row.mode === "daily" && row.period === date && row.id === id);
+    }
+
     async function readScores() {
         try { return JSON.parse(await readFile(file, "utf8")); }
         catch (error) { if (error.code !== "ENOENT") throw error; return []; }
@@ -32,7 +51,7 @@ module.exports = function createCompetition(profileDirectory) {
             const scores = (await readScores()).filter((row) => now() - Date.parse(row.period) < 21 * 86400000);
             const existing = scores.find((row) => row.id === player.id && row.mode === game.mode && row.period === game.period);
             const score = median(times);
-            if (existing && existing.score <= score) return;
+            if (existing && (game.mode === "daily" || existing.score <= score)) return;
             if (existing) scores.splice(scores.indexOf(existing), 1);
             scores.push({ id: player.id, name: player.name, mode: game.mode, period: game.period, score });
             await mkdir(profileDirectory, { recursive: true, mode: 0o700 });
@@ -76,11 +95,15 @@ module.exports = function createCompetition(profileDirectory) {
         const fail = (status, error) => reply(status, { error });
         const route = url.pathname.slice("/competition/".length);
         if (!user) return fail(401, "Sign in with Google to access practice and competition.");
+        if (request.method === "GET" && route === "daily-status") {
+            const date = day();
+            return reply(200, { played: await hasPlayedDaily(date, user.id), rewards });
+        }
         if (request.method === "GET" && route === "leaderboard") {
             const mode = url.searchParams.get("mode") === "daily" ? "daily" : "ranked";
             const current = period(mode);
             const rows = (await readScores()).filter((row) => row.mode === mode && row.period === current)
-                .sort((a, b) => a.score - b.score).slice(0, 20).map(({ name, score }) => ({ name, score }));
+                .sort((a, b) => a.score - b.score).slice(0, 20).map(({ name, score }) => ({ name, score, reward: mode === "daily" ? rewardFor(score)?.name : undefined }));
             return reply(200, { period: current, rows });
         }
 
@@ -95,11 +118,23 @@ module.exports = function createCompetition(profileDirectory) {
             if (!["duel", "daily", "ranked"].includes(mode)) return fail(400, "Choose a game mode.");
             const active = [...games.values()].filter((entry) => !entry.finished && entry.players.some((p) => p.id === user.id));
             if (active.length >= 4 || games.size >= 1000) return fail(429, "Close another match or try again shortly.");
+            const current = period(mode);
+            if (mode === "daily") {
+                const used = () => fail(409, "Daily attempt used. The next challenge opens at 00:00 UTC.");
+                if (await hasPlayedDaily(current, user.id)) return used();
+                await mkdir(join(profileDirectory, "daily-attempts", current), { recursive: true, mode: 0o700 });
+                try {
+                    await mkdir(dailyAttempt(current, user.id), { mode: 0o700 });
+                } catch (error) {
+                    if (error.code === "EEXIST") return used();
+                    throw error;
+                }
+            }
             do { code = randomBytes(4).toString("hex").toUpperCase(); } while (games.has(code));
-            game = { mode, period: period(mode), players: [{ id: user.id, name: user.name, sessionId }],
+            game = { mode, period: current, players: [{ id: user.id, name: user.name, sessionId }],
                 limit: mode === "ranked" ? 5 : 3, touched: time, results: [], go: 0, finished: false };
             games.set(code, game);
-            if (mode !== "duel") startRound(game, time);
+            if (mode !== "duel") startRound(game, now());
         }
         if (!game) return fail(404, "Room or challenge expired. Start a new one.");
         let seat = game.players.findIndex((player) => player.sessionId === sessionId);
@@ -130,9 +165,12 @@ module.exports = function createCompetition(profileDirectory) {
             advance(game, time);
         }
         if (game.finished) await saveScore(game);
+        const dailyReward = game.mode === "daily" && game.finished && game.results.every((round) => round.times[0])
+            ? rewardFor(median(game.results.map((round) => round.times[0])))
+            : null;
         const phase = game.finished ? "finished" : !game.go ? "lobby" : game.next ? "between" :
             game.inputs[seat] !== undefined ? "recorded" : time >= game.go ? "go" : "wait";
-        reply(200, { code, seat, phase, round: Math.min(game.results.length + (game.next || game.finished ? 0 : 1), game.limit),
-            limit: game.limit, mode: game.mode, players: game.players.map((p) => p.name), results: game.results });
+        return reply(200, { code, seat, phase, round: Math.min(game.results.length + (game.next || game.finished ? 0 : 1), game.limit),
+            limit: game.limit, mode: game.mode, players: game.players.map((p) => p.name), results: game.results, dailyReward });
     };
 };
