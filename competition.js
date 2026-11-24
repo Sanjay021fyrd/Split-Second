@@ -29,12 +29,37 @@
     const dailyTargets = element("daily-badge-targets");
     const dailyFeedback = element("daily-feedback");
 
+    const homeBadge = element("daily-home-badge");
+    const badgeSymbols = { Lightning: "⚡︎", Quickdraw: "➶", "Sharp Reflexes": "◎" };
+    let badgeExpiry;
+
+    function badgeIcon(name) {
+        const icon = document.createElement("span");
+        icon.className = "daily-badge-icon";
+        icon.dataset.badge = name;
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = badgeSymbols[name];
+        return icon;
+    }
+
+    function showHomeBadge(reward, resetsAt) {
+        clearTimeout(badgeExpiry);
+        homeBadge.hidden = !reward || resetsAt <= Date.now();
+        if (homeBadge.hidden) {
+            homeBadge.replaceChildren();
+            return;
+        }
+        homeBadge.replaceChildren(badgeIcon(reward.name), "Today's badge: " + reward.name);
+        badgeExpiry = setTimeout(() => showHomeBadge(null), resetsAt - Date.now());
+    }
+
     async function refreshDaily() {
         const token = ++dailyStatusRequest;
         try {
             const data = await api("daily-status", {});
             if (token !== dailyStatusRequest) return;
             dailyPlayed = data.played;
+            showHomeBadge(data.reward, data.resetsAt);
             dailyStart.disabled = false;
             element("competition-daily-action").textContent = data.played ? "Attempt used" : "View challenge";
             if (!dailyTargets.childElementCount) {
@@ -42,7 +67,7 @@
                     const item = document.createElement("li");
                     const title = document.createElement("strong");
                     title.textContent = name;
-                    item.append(title, "Under " + target + " ms");
+                    item.append(badgeIcon(name), title, "Under " + target + " ms");
                     return item;
                 }));
             }
@@ -200,6 +225,8 @@
                     : valid.length === times.length
                         ? "You finished all three rounds. Aim for a median under 320 ms for Sharp Reflexes. Good luck tomorrow!"
                         : "A badge takes three valid reactions. Watch for CLICK! and give it another shot tomorrow. Good luck!";
+                if (badge) dailyFeedback.prepend(badgeIcon(badge));
+                refreshDaily();
                 dailyFeedback.dataset.earned = String(Boolean(badge));
                 dailyFeedback.hidden = false;
                 dailyCard = {

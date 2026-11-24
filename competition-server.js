@@ -27,6 +27,10 @@ module.exports = function createCompetition(profileDirectory) {
     const dailyAttempt = (date, id) => join(profileDirectory, "daily-attempts", date,
         createHash("sha256").update(id).digest("hex"));
 
+    async function findDailyScore(date, id) {
+        return (await readScores()).find((row) => row.mode === "daily" && row.period === date && row.id === id);
+    }
+
     async function hasPlayedDaily(date, id) {
         try {
             await stat(dailyAttempt(date, id));
@@ -34,7 +38,7 @@ module.exports = function createCompetition(profileDirectory) {
         } catch (error) {
             if (error.code !== "ENOENT") throw error;
         }
-        return (await readScores()).some((row) => row.mode === "daily" && row.period === date && row.id === id);
+        return Boolean(await findDailyScore(date, id));
     }
 
     async function readScores() {
@@ -97,7 +101,13 @@ module.exports = function createCompetition(profileDirectory) {
         if (!user) return fail(401, "Sign in with Google to access practice and competition.");
         if (request.method === "GET" && route === "daily-status") {
             const date = day();
-            return reply(200, { played: await hasPlayedDaily(date, user.id), rewards });
+            const result = await findDailyScore(date, user.id);
+            return reply(200, {
+                played: Boolean(result) || await hasPlayedDaily(date, user.id),
+                rewards,
+                reward: result ? rewardFor(result.score) : null,
+                resetsAt: Date.parse(date) + 86400000
+            });
         }
         if (request.method === "GET" && route === "leaderboard") {
             const mode = url.searchParams.get("mode") === "daily" ? "daily" : "ranked";
