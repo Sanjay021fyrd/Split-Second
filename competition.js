@@ -20,6 +20,8 @@
     let dailyCard = null;
     const dailyButton = element("competition-daily");
     let dailyStatusRequest = 0;
+    let dailyPlayed = false;
+    const dailyUsedDialog = element("daily-used-dialog");
 
     const dailyIntro = element("daily-intro");
     const dailyStart = element("daily-intro-start");
@@ -32,7 +34,8 @@
         try {
             const data = await api("daily-status", {});
             if (token !== dailyStatusRequest) return;
-            dailyStart.disabled = data.played;
+            dailyPlayed = data.played;
+            dailyStart.disabled = false;
             element("competition-daily-action").textContent = data.played ? "Attempt used" : "View challenge";
             if (!dailyTargets.childElementCount) {
                 dailyTargets.replaceChildren(...data.rewards.map(({ name, target }) => {
@@ -77,7 +80,11 @@
             method, cache: "no-store", signal: AbortSignal.timeout(5000)
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Could not reach the game server.");
+        if (!response.ok) {
+            const error = new Error(data.error || "Could not reach the game server.");
+            error.status = response.status;
+            throw error;
+        }
         return data;
     }
 
@@ -269,6 +276,12 @@
         } catch (error) {
             if (token === generation) {
                 competitionRun = null;
+                if (params.mode === "daily" && error.status === 409) {
+                    arena.hidden = true;
+                    openDailyIntro();
+                    dailyUsedDialog.showModal();
+                    return;
+                }
                 showSignal("UNAVAILABLE", "finished");
                 status.textContent = error.message;
             }
@@ -306,7 +319,10 @@
     element("competition-weekly").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "ranked" })));
     dailyButton.addEventListener("click", () => confirmRunExit(openDailyIntro));
     element("daily-intro-back").addEventListener("click", backFromDailyIntro);
-    dailyStart.addEventListener("click", () => startOnline("create", { mode: "daily" }));
+    dailyStart.addEventListener("click", () => {
+        if (dailyPlayed) dailyUsedDialog.showModal();
+        else startOnline("create", { mode: "daily" });
+    });
     element("competition-create").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "duel" })));
     element("competition-join").addEventListener("submit", (event) => {
         event.preventDefault();
