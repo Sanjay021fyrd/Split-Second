@@ -1598,6 +1598,11 @@ h1 {
     }
 }
 .exit-run-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    max-height: calc(100% - 32px);
+    overflow: auto;
     width: min(420px, calc(100% - 32px));
     padding: 24px;
     border: 1px solid rgba(var(--accent-rgb), .4);
@@ -1789,4 +1794,29 @@ body.eclipse-signin {
     .eclipse-signin #login-panel { align-items: end; }
     .eclipse-content { padding: 32vh 24px 72px; }
     .eclipse-signin #auth-status { inset-inline: 24px; }
+}
+
+#daily-intro > p { margin-block: 12px; line-height: 1.5; }
+.daily-badge-targets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+}
+.daily-badge-targets li, #daily-feedback {
+    padding: 12px;
+    border: 1px solid rgba(var(--accent-rgb), .35);
+    border-radius: 10px;
+    background: var(--panel);
+}
+.daily-badge-targets strong { display: block; color: var(--accent-soft); }
+#daily-feedback[data-earned="true"] { border-color: var(--accent); font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) {
+    #daily-intro:not([hidden]), #daily-feedback:not([hidden]) {
+        animation: competition-in 220ms ease-out;
+    }
+    .daily-badge-targets li { animation: competition-in 220ms ease-out backwards; }
+    .daily-badge-targets li:nth-child(2) { animation-delay: 45ms; }
+    .daily-badge-targets li:nth-child(3) { animation-delay: 90ms; }
 }

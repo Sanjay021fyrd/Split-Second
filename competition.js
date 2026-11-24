@@ -21,20 +21,55 @@
     const dailyButton = element("competition-daily");
     let dailyStatusRequest = 0;
 
+    const dailyIntro = element("daily-intro");
+    const dailyStart = element("daily-intro-start");
+    const dailyIntroStatus = element("daily-intro-status");
+    const dailyTargets = element("daily-badge-targets");
+    const dailyFeedback = element("daily-feedback");
+
     async function refreshDaily() {
         const token = ++dailyStatusRequest;
         try {
             const data = await api("daily-status", {});
             if (token !== dailyStatusRequest) return;
-            dailyButton.disabled = data.played;
-            element("competition-daily-action").textContent = data.played ? "Attempt used" : "Play today";
-            const targets = data.rewards.map(({ name, target }) => name + " under " + target + " ms").join(" • ");
-            element("competition-daily-targets").textContent =
-                (data.played ? "Next attempt at 00:00 UTC. " : "Starting uses today's attempt. ") +
-                "Daily badges by median (3 valid rounds): " + targets + ".";
+            dailyStart.disabled = data.played;
+            element("competition-daily-action").textContent = data.played ? "Attempt used" : "View challenge";
+            if (!dailyTargets.childElementCount) {
+                dailyTargets.replaceChildren(...data.rewards.map(({ name, target }) => {
+                    const item = document.createElement("li");
+                    const title = document.createElement("strong");
+                    title.textContent = name;
+                    item.append(title, "Under " + target + " ms");
+                    return item;
+                }));
+            }
+            dailyIntroStatus.textContent = data.played
+                ? "Today's attempt is used. The next challenge opens at 00:00 UTC."
+                : "One attempt per day. Starting uses today's attempt, even if you leave early.";
         } catch {
-            // The server still enforces the limit when a run starts.
+            if (token !== dailyStatusRequest) return;
+            dailyStart.disabled = true;
+            dailyIntroStatus.textContent = "Could not load today's challenge. Reopen this screen to retry.";
         }
+    }
+
+    function openDailyIntro() {
+        const game = element("game");
+        if (!game.hidden && isGameActive) resetValues();
+        game.hidden = true;
+        panel.dataset.playing = "true";
+        dailyIntro.hidden = false;
+        dailyStart.disabled = true;
+        dailyIntroStatus.textContent = "Loading today's challenge…";
+        element("daily-intro-title").focus();
+        refreshDaily();
+    }
+
+    function backFromDailyIntro() {
+        dailyIntro.hidden = true;
+        delete panel.dataset.playing;
+        element("game").hidden = !panel.dataset.signedIn;
+        dailyButton.focus();
     }
 
     async function api(route, params, method = "GET") {
@@ -64,6 +99,8 @@
     function openArena() {
         stop();
         results.replaceChildren();
+        dailyFeedback.hidden = true;
+        dailyIntro.hidden = true;
         dailyCard = null;
         element("competition-share").hidden = true;
         const game = element("game");
@@ -149,10 +186,15 @@
             if (state.mode === "daily") {
                 const share = element("competition-share");
                 const badge = state.dailyReward?.name;
-                if (badge) status.textContent += " · " + badge + " badge earned";
-                else if (state.results.every((row) => row.times[state.seat])) status.textContent += " · No badge earned";
                 const times = state.results.map((row) => row.times[state.seat]);
                 const valid = times.filter(Boolean);
+                dailyFeedback.textContent = badge
+                    ? badge + " badge earned!"
+                    : valid.length === times.length
+                        ? "You finished all three rounds. Aim for a median under 320 ms for Sharp Reflexes. Good luck tomorrow!"
+                        : "A badge takes three valid reactions. Watch for CLICK! and give it another shot tomorrow. Good luck!";
+                dailyFeedback.dataset.earned = String(Boolean(badge));
+                dailyFeedback.hidden = false;
                 dailyCard = {
                     modeLabel: "DAILY CHALLENGE", big: valid.length === times.length ? summary.match(/\d+/)[0] : "COMPLETE",
                     unit: valid.length === times.length ? "ms" : "", sub: badge || "3-ROUND CLASSIC", rank: null, color: "#72ba57",
@@ -166,6 +208,13 @@
         }
 
         status.textContent = "Round " + state.round + " / " + state.limit;
+        if (state.mode === "daily" && state.round !== previous?.round) {
+            status.getAnimations().forEach((animation) => animation.cancel());
+            if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                status.animate([{ opacity: 0.45, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }],
+                    { duration: 220, easing: "ease-out" });
+            }
+        }
         if (state.phase === "go" && !sent) {
             if (previous?.phase !== "go" || previous?.round !== state.round) {
                 showSignal("CLICK!", "go");
@@ -255,7 +304,9 @@
 
     element("competition-practice").addEventListener("click", () => confirmRunExit(startGuest));
     element("competition-weekly").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "ranked" })));
-    dailyButton.addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "daily" })));
+    dailyButton.addEventListener("click", () => confirmRunExit(openDailyIntro));
+    element("daily-intro-back").addEventListener("click", backFromDailyIntro);
+    dailyStart.addEventListener("click", () => startOnline("create", { mode: "daily" }));
     element("competition-create").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "duel" })));
     element("competition-join").addEventListener("submit", (event) => {
         event.preventDefault();

@@ -72,7 +72,6 @@
             </button>
         </div>
 
-        <p id="competition-daily-targets" role="status">Daily badges require three valid reactions. Starting uses today's attempt.</p>
         <details>
             <summary>How Weekly Ranked works</summary>
             <p>Play five rounds and record a valid reaction in each. Your score is the middle time when all five are sorted from fastest to slowest. You can replay, and only your fastest score counts toward the weekly leaderboard. The board resets Monday at 00:00 UTC.</p>
@@ -87,12 +86,24 @@
         </form>
     </div>
 
+    <section id="daily-intro" aria-labelledby="daily-intro-title" hidden>
+        <div class="competition-arena-header">
+            <h2 id="daily-intro-title" tabindex="-1">Daily Challenge</h2>
+            <button id="daily-intro-back" class="auth-button" type="button">Back to hub</button>
+        </div>
+        <p>Play three rounds. Your median (the middle of your three times) determines your badge. All three reactions must be valid.</p>
+        <ul id="daily-badge-targets" class="daily-badge-targets" aria-label="Badge targets"></ul>
+        <p id="daily-intro-status" role="status">Loading today's challenge…</p>
+        <button id="daily-intro-start" class="auth-button" type="button" disabled>Start Daily Challenge</button>
+    </section>
+
     <div id="competition-arena" hidden>
         <div class="competition-arena-header">
             <p id="competition-status" role="status"></p>
             <button id="competition-back" class="auth-button" type="button"><span aria-hidden="true">&larr;</span> Back to hub</button>
         </div>
         <button id="competition-signal" type="button">WAIT</button>
+        <p id="daily-feedback" role="status" hidden></p>
         <ol id="competition-results"></ol>
         <button id="competition-share" class="auth-button" type="button" hidden>Share daily result card</button>
     </div>
