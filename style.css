@@ -240,9 +240,13 @@ h1 {
 .auth-button {
     padding: 8px 10px;
     font: inherit;
+}
+
+.auth-button {
     text-decoration: none;
 }
 
+.game-options select,
 :is(.auth-button, .ghost-btn, .reset-btn, .icon-btn) {
     border: 1px solid rgba(var(--accent-rgb), .45);
     border-radius: var(--radius-control);
