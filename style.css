@@ -14,6 +14,17 @@
     --area-2: #c8dc8d;
     --font: "Segoe UI", Arial, sans-serif;
     --title-font: var(--font);
+    --size-small: .875rem;
+    --size-body: 1rem;
+    --size-icon: 1.25rem;
+    --size-heading: 1.5rem;
+    --size-signal: clamp(1.5rem, 5vw, 3rem);
+    --size-score: clamp(2.5rem, 8vw, 5rem);
+    --radius-detail: 4px;
+    --radius-control: 8px;
+    --radius-card: 16px;
+    --radius-panel: 24px;
+    --radius-circle: 50%;
     --title-case: none;
     --title-track: 0;
     --glow-1: rgba(var(--accent-rgb), .16);
@@ -85,7 +96,7 @@ button {
     z-index: 1;
     width: min(100%, 980px);
     padding: 32px;
-    border-radius: 30px;
+    border-radius: var(--radius-panel);
     background: var(--panel);
     border: 1px solid rgba(255, 255, 255, .06);
     box-shadow: 0 40px 100px rgba(0, 0, 0, .55);
@@ -144,9 +155,9 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 15px;
+    border-radius: var(--radius-card);
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    font-size: 24px;
+    font-size: var(--size-heading);
     box-shadow: 0 10px 35px rgba(var(--accent-rgb), .4);
     animation: iconFloat 4s ease-in-out infinite;
 }
@@ -157,7 +168,7 @@ button {
 
 h1 {
     font-family: var(--title-font);
-    font-size: 25px;
+    font-size: var(--size-heading);
     font-weight: 800;
     text-transform: var(--title-case);
     letter-spacing: var(--title-track);
@@ -165,7 +176,7 @@ h1 {
 
 .brand p {
     color: var(--muted);
-    font-size: 13px;
+    font-size: var(--size-small);
     margin-top: 3px;
 }
 
@@ -182,7 +193,7 @@ h1 {
 }
 
 .level {
-    font-size: 12px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1px;
     color: var(--accent-soft);
@@ -191,7 +202,7 @@ h1 {
 .xp-track {
     width: 90px;
     height: 7px;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     background: rgba(255, 255, 255, .08);
     overflow: hidden;
 }
@@ -200,14 +211,14 @@ h1 {
     display: block;
     width: 0;
     height: 100%;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     transition: width .8s cubic-bezier(.2, .9, .3, 1);
 }
 
 .xp small {
     color: var(--dim);
-    font-size: 11px;
+    font-size: var(--size-small);
     min-width: 74px;
 }
 
@@ -221,18 +232,23 @@ h1 {
     display: grid;
     gap: 4px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: var(--size-small);
     font-weight: 700;
 }
 
 .game-options select,
 .auth-button {
     padding: 8px 10px;
+    font: inherit;
+    text-decoration: none;
+}
+
+:is(.auth-button, .ghost-btn, .reset-btn, .icon-btn) {
     border: 1px solid rgba(var(--accent-rgb), .45);
-    border-radius: 8px;
+    border-radius: var(--radius-control);
     background: var(--panel);
     color: var(--text);
-    font: inherit;
+    cursor: pointer;
 }
 
 .game-options select:disabled {
@@ -244,7 +260,7 @@ h1 {
     z-index: 1;
     width: min(100%, 980px);
     padding: 16px;
-    border-radius: 16px;
+    border-radius: var(--radius-card);
     background: var(--panel);
     overflow-wrap: anywhere;
 }
@@ -258,7 +274,6 @@ h1 {
 
 #auth-status, #account-email { color: var(--muted); }
 #auth-status:empty { display: none; }
-.auth-button { cursor: pointer; text-decoration: none; }
 
 /* ============ Shared button feel ============ */
 
@@ -273,7 +288,7 @@ h1 {
 
 .ripple {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
     background: rgba(255, 255, 255, .35);
     transform: scale(0);
     animation: ripple .65s ease-out forwards;
@@ -287,11 +302,7 @@ h1 {
 .icon-btn {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, .1);
-    background: rgba(255, 255, 255, .04);
-    font-size: 20px;
-    cursor: pointer;
+    font-size: var(--size-icon);
 }
 
 /* ============ Mode selector with sliding pill ============ */
@@ -308,7 +319,7 @@ h1 {
     position: absolute;
     top: 0;
     left: 0;
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     background: linear-gradient(145deg, rgba(var(--accent-rgb), .3), rgba(var(--accent2-rgb), .12));
     border: 1px solid rgba(var(--accent-rgb), .7);
     box-shadow: 0 0 24px rgba(var(--accent-rgb), .25);
@@ -325,7 +336,7 @@ h1 {
     padding: 12px 8px;
     text-align: center;
     color: var(--muted);
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     border: 1px solid rgba(255, 255, 255, .08);
     background: rgba(255, 255, 255, .025);
     cursor: pointer;
@@ -333,14 +344,14 @@ h1 {
 
 .mode-btn strong {
     display: block;
-    font-size: 14px;
+    font-size: var(--size-small);
     color: var(--text);
 }
 
 .mode-btn small {
     display: block;
     margin-top: 3px;
-    font-size: 11px;
+    font-size: var(--size-small);
 }
 
 .mode-btn.active {
@@ -376,7 +387,7 @@ h1 {
 
 .hud-card {
     padding: 15px;
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     background: rgba(255, 255, 255, .025);
     border: 1px solid rgba(255, 255, 255, .06);
 }
@@ -384,7 +395,7 @@ h1 {
 .hud-card span {
     display: block;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1.5px;
 }
@@ -398,7 +409,7 @@ h1 {
 
 .hud-card strong {
     margin-top: 5px;
-    font-size: 19px;
+    font-size: var(--size-icon);
 }
 
 .roll {
@@ -414,7 +425,7 @@ h1 {
     height: 5px;
     margin: 15px 0;
     background: rgba(255, 255, 255, .05);
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     overflow: hidden;
 }
 
@@ -461,7 +472,7 @@ h1 {
     align-items: center;
     text-align: center;
     overflow: hidden;
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     background: radial-gradient(circle, var(--area-1), var(--area-2));
     border: 1px solid rgba(255, 255, 255, .07);
     transition: background .25s, box-shadow .25s;
@@ -487,7 +498,7 @@ h1 {
 
 .signal-icon {
     height: 60px;
-    font-size: 46px;
+    font-size: var(--size-score);
     line-height: 60px;
 }
 
@@ -497,7 +508,7 @@ h1 {
 
 .message {
     font-family: var(--title-font);
-    font-size: clamp(34px, 6vw, 65px);
+    font-size: var(--size-signal);
     font-weight: 900;
     letter-spacing: -2px;
     text-transform: var(--title-case);
@@ -524,7 +535,7 @@ h1 {
 .sub-message {
     margin-top: 8px;
     color: var(--muted);
-    font-size: 15px;
+    font-size: var(--size-body);
     max-width: 440px;
 }
 
@@ -532,11 +543,11 @@ h1 {
     margin-top: 25px;
     padding: 14px 30px;
     border: none;
-    border-radius: 11px;
+    border-radius: var(--radius-control);
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: white;
     font-weight: 800;
-    font-size: 14px;
+    font-size: var(--size-small);
     letter-spacing: .8px;
     cursor: pointer;
     box-shadow: 0 12px 30px rgba(var(--accent-rgb), .3);
@@ -549,14 +560,9 @@ h1 {
 .ghost-btn {
     margin-top: 25px;
     padding: 14px 24px;
-    border-radius: 11px;
-    border: 1px solid rgba(var(--accent-rgb), .45);
-    background: transparent;
-    color: var(--accent-soft);
     font-weight: 800;
-    font-size: 14px;
+    font-size: var(--size-small);
     letter-spacing: .8px;
-    cursor: pointer;
 }
 
 /* ---- signal colours (same in every theme so they stay recognisable) ---- */
@@ -570,7 +576,7 @@ h1 {
 }
 
 .game-area.ready .message {
-    font-size: clamp(46px, 8vw, 80px);
+    font-size: var(--size-score);
     text-shadow: 0 0 35px rgba(255, 255, 255, .6);
 }
 
@@ -594,7 +600,7 @@ h1 {
     gap: 14px;
     margin-bottom: 18px;
     padding: 12px 18px;
-    border-radius: 18px;
+    border-radius: var(--radius-card);
     background: rgba(0, 0, 0, .55);
     border: 1px solid rgba(255, 255, 255, .08);
     box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
@@ -603,7 +609,7 @@ h1 {
 .light {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
     background: radial-gradient(circle at 35% 30%, #3a1114, #14060a);
     border: 2px solid #26090c;
     transition: background .12s, box-shadow .12s;
@@ -633,7 +639,7 @@ h1 {
     display: flex;
     justify-content: space-between;
     z-index: 1;
-    font-size: 12px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1.5px;
 }
@@ -657,7 +663,7 @@ h1 {
     top: 50%;
     width: 9px;
     height: 9px;
-    border-radius: 2px;
+    border-radius: var(--radius-detail);
     background: var(--c);
     animation: fly 1s ease-out forwards;
 }
@@ -672,7 +678,7 @@ h1 {
     width: 60px;
     height: 60px;
     margin: -30px 0 0 -30px;
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
     border: 4px solid var(--rc, #fff);
     box-shadow: 0 0 24px var(--rc, #fff);
     transform: scale(.2);
@@ -716,7 +722,7 @@ h1 {
 .fx .slash {
     position: absolute;
     height: 5px;
-    border-radius: 5px;
+    border-radius: var(--radius-detail);
     background: linear-gradient(90deg, transparent, #fff 18%, #fff 82%, transparent);
     box-shadow: 0 0 18px var(--sc), 0 0 44px var(--sc);
     transform: translate(-50%, -50%) rotate(var(--ang)) scaleX(0);
@@ -741,7 +747,7 @@ h1 {
 
 .stat-card {
     padding: 18px;
-    border-radius: 15px;
+    border-radius: var(--radius-card);
     background: rgba(15, 23, 42, .75);
     border: 1px solid rgba(255, 255, 255, .06);
 }
@@ -764,14 +770,14 @@ h1 {
 .stat-card span {
     display: block;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1.5px;
 }
 
 .stat-card strong {
     margin-top: 6px;
-    font-size: 25px;
+    font-size: var(--size-heading);
 }
 
 .stat-card small {
@@ -787,7 +793,7 @@ h1 {
     justify-content: space-between;
     margin-bottom: 8px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1px;
 }
@@ -798,7 +804,7 @@ h1 {
 
 .speed-track {
     height: 8px;
-    border-radius: 20px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     background: rgba(255, 255, 255, .06);
 }
@@ -806,7 +812,7 @@ h1 {
 #speed-meter {
     width: 0%;
     height: 100%;
-    border-radius: 20px;
+    border-radius: var(--radius-panel);
     background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
     transition: width .5s ease;
 }
@@ -818,7 +824,7 @@ h1 {
     margin-top: 20px;
     padding: 35px;
     text-align: center;
-    border-radius: 25px;
+    border-radius: var(--radius-panel);
     background:
         radial-gradient(circle at top, rgba(var(--accent-rgb), .2), transparent 45%),
         var(--panel);
@@ -837,7 +843,7 @@ h1 {
 }
 
 .result-icon {
-    font-size: 55px;
+    font-size: var(--size-score);
     margin-bottom: 10px;
     animation: trophyFloat 2s infinite ease-in-out;
 }
@@ -848,7 +854,7 @@ h1 {
 
 .result-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 2px;
 }
@@ -856,13 +862,13 @@ h1 {
 .result-panel h2 {
     margin: 8px 0;
     font-family: var(--title-font);
-    font-size: 62px;
+    font-size: var(--size-score);
     font-weight: 900;
     color: var(--accent-soft);
 }
 
 .final-rating {
-    font-size: 24px;
+    font-size: var(--size-heading);
     font-weight: 900;
     color: var(--accent-soft);
 }
@@ -876,11 +882,11 @@ h1 {
     display: inline-block;
     margin-top: 14px;
     padding: 7px 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-panel);
     background: rgba(245, 158, 11, .12);
     border: 1px solid rgba(245, 158, 11, .4);
     color: var(--accent-soft);
-    font-size: 12px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1px;
     animation: badgePop .6s cubic-bezier(.2, 1.6, .3, 1) .5s both;
@@ -896,7 +902,7 @@ h1 {
     width: 120px;
     margin: 22px auto;
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-card);
     background: linear-gradient(145deg, rgba(var(--accent-rgb), .2), rgba(var(--accent2-rgb), .08));
     border: 1px solid rgba(var(--accent-rgb), .3);
 }
@@ -904,7 +910,7 @@ h1 {
 .rank-box span {
     display: block;
     color: var(--muted);
-    font-size: 10px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1px;
 }
@@ -912,7 +918,7 @@ h1 {
 .rank-box strong {
     display: block;
     margin-top: 3px;
-    font-size: 42px;
+    font-size: var(--size-score);
     color: var(--tc);
     text-shadow: 0 0 22px var(--tc);
 }
@@ -939,7 +945,7 @@ h1 {
 
 .viz-card {
     padding: 16px 14px 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-card);
     background: rgba(255, 255, 255, .035);
     border: 1px solid rgba(255, 255, 255, .06);
 }
@@ -947,7 +953,7 @@ h1 {
 .viz-card figcaption {
     margin-bottom: 8px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1.5px;
 }
@@ -994,14 +1000,14 @@ h1 {
 
 .gauge-tick {
     fill: var(--dim);
-    font-size: 9px;
+    font-size: var(--size-small);
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .gauge-readout {
     margin-top: 2px;
-    font-size: 24px;
+    font-size: var(--size-heading);
     font-weight: 800;
 }
 
@@ -1049,7 +1055,7 @@ h1 {
 .bell-caption {
     margin-top: 4px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: var(--size-small);
 }
 
 .result-grid {
@@ -1061,14 +1067,14 @@ h1 {
 
 .result-grid div {
     padding: 15px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: rgba(255, 255, 255, .035);
 }
 
 .result-grid span {
     display: block;
     color: var(--muted);
-    font-size: 10px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1px;
 }
@@ -1076,13 +1082,13 @@ h1 {
 .result-grid strong {
     display: block;
     margin-top: 6px;
-    font-size: 18px;
+    font-size: var(--size-icon);
 }
 
 .history-title {
     margin-bottom: 12px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 800;
     letter-spacing: 1.5px;
 }
@@ -1099,7 +1105,7 @@ h1 {
 
 .round-bar {
     min-height: 15px;
-    border-radius: 7px 7px 3px 3px;
+    border-radius: var(--radius-detail);
     background: linear-gradient(180deg, var(--accent-2), var(--accent));
     position: relative;
     animation: barIn .6s cubic-bezier(.2, .9, .3, 1.2) backwards;
@@ -1115,7 +1121,7 @@ h1 {
     left: 50%;
     transform: translateX(-50%);
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
     font-weight: 700;
 }
 
@@ -1125,7 +1131,7 @@ h1 {
     left: 50%;
     transform: translateX(-50%);
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--size-small);
 }
 
 @keyframes barIn {
@@ -1146,11 +1152,11 @@ h1 {
 
 .recent li {
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: var(--radius-panel);
     background: rgba(255, 255, 255, .04);
     border: 1px solid rgba(255, 255, 255, .07);
     color: var(--muted);
-    font-size: 12px;
+    font-size: var(--size-small);
 }
 
 .recent li.latest {
@@ -1173,7 +1179,7 @@ h1 {
     align-items: center;
     margin-top: 18px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: var(--size-small);
 }
 
 .game-footer strong {
@@ -1183,11 +1189,6 @@ h1 {
 
 .reset-btn {
     padding: 8px 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, .1);
-    background: rgba(255, 255, 255, .03);
-    color: var(--muted);
-    cursor: pointer;
 }
 
 /* Hover feedback for menu and game controls. */
@@ -1196,7 +1197,7 @@ h1 {
 }
 
 @media (hover: hover) {
-    :is(.icon-btn, .mode-btn, .start-btn, .ghost-btn, .reset-btn):hover {
+    :is(.auth-button, .icon-btn, .mode-btn, .start-btn, .ghost-btn, .reset-btn):hover {
         background-color: rgba(var(--accent-rgb), .2);
         border-color: var(--accent);
         color: var(--text);
@@ -1208,7 +1209,7 @@ h1 {
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    :is(.icon-btn, .mode-btn, .start-btn, .ghost-btn, .reset-btn):hover {
+    :is(.auth-button, .icon-btn, .mode-btn, .start-btn, .ghost-btn, .reset-btn):hover {
         translate: 0 -2px;
     }
 }
@@ -1223,7 +1224,7 @@ h1 {
     align-items: center;
     gap: 4px;
     padding: 16px 34px;
-    border-radius: 18px;
+    border-radius: var(--radius-card);
     background: linear-gradient(135deg, rgba(var(--accent-rgb), .95), rgba(var(--accent2-rgb), .95));
     color: #fff;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
@@ -1233,12 +1234,12 @@ h1 {
 }
 
 .banner strong {
-    font-size: 20px;
+    font-size: var(--size-icon);
     letter-spacing: 2px;
 }
 
 .banner span {
-    font-size: 14px;
+    font-size: var(--size-small);
 }
 
 .banner.show {
@@ -1260,11 +1261,11 @@ h1 {
     transform: translate(-50%, 20px);
     max-width: calc(100% - 32px);
     padding: 12px 20px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--panel);
     border: 1px solid rgba(255, 255, 255, .12);
     color: var(--text);
-    font-size: 14px;
+    font-size: var(--size-small);
     opacity: 0;
     pointer-events: none;
     transition: .3s;
@@ -1319,7 +1320,7 @@ h1 {
     }
 
     .stat-card strong {
-        font-size: 18px;
+        font-size: var(--size-icon);
     }
 
     .stat-card small {
@@ -1341,7 +1342,7 @@ h1 {
     }
 
     .result-panel h2 {
-        font-size: 44px;
+        font-size: var(--size-score);
     }
 }
 
@@ -1372,7 +1373,7 @@ h1 {
 #competition {
     padding: clamp(16px, 3vw, 28px);
     border: 1px solid rgba(var(--accent-rgb), .25);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     background: radial-gradient(ellipse at top right, rgba(var(--accent2-rgb), .13), transparent 64%), var(--panel);
     box-shadow: 0 14px 38px rgba(0, 0, 0, .12);
 }
@@ -1383,7 +1384,7 @@ h1 {
 
 .competition-heading h2 {
     font-family: var(--title-font);
-    font-size: clamp(23px, 3vw, 34px);
+    font-size: var(--size-heading);
     line-height: 1.1;
 }
 
@@ -1392,7 +1393,7 @@ h1 {
 #competition-board-note,
 #competition-privacy {
     color: var(--muted);
-    font-size: .86rem;
+    font-size: var(--size-small);
 }
 
 .competition-heading p { margin-top: 6px; }
@@ -1411,7 +1412,7 @@ h1 {
     padding: 14px;
     min-width: 0;
     border: 1px solid rgba(var(--accent-rgb), .28);
-    border-radius: 16px;
+    border-radius: var(--radius-card);
     background: linear-gradient(150deg, rgba(var(--accent-rgb), .10), transparent 80%), var(--panel);
     color: var(--text);
     text-align: left;
@@ -1425,13 +1426,13 @@ h1 {
     width: 34px;
     height: 34px;
     margin-bottom: 4px;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     background: rgba(var(--accent-rgb), .17);
     color: var(--accent-soft);
-    font: 700 1.2rem system-ui, sans-serif;
+    font: 700 var(--size-icon) system-ui, sans-serif;
 }
 
-.competition-card-title { font-size: 1.03rem; font-weight: 800; }
+.competition-card-title { font-size: var(--size-body); font-weight: 800; }
 .competition-card-meta { line-height: 1.35; }
 
 .competition-card-action {
@@ -1442,7 +1443,7 @@ h1 {
     margin-top: auto;
     padding-top: 9px;
     color: var(--accent-soft);
-    font-size: .79rem;
+    font-size: var(--size-small);
     font-weight: 800;
 }
 
@@ -1455,6 +1456,11 @@ h1 {
         box-shadow: 0 8px 16px rgba(var(--accent-rgb), .16);
     }
     .competition-card:enabled:hover .competition-card-action span { transform: translateX(3px); }
+}
+
+#competition-daily[data-attempt-used] {
+    border-style: dashed;
+    background: var(--panel);
 }
 
 #competition :is(button, input, select, summary):focus-visible {
@@ -1472,8 +1478,9 @@ h1 {
     gap: 8px 12px;
 }
 
-#competition-join, .competition-arena-header, .competition-board-header { justify-content: space-between; }
+.competition-arena-header, .competition-board-header { justify-content: space-between; }
 #competition-join { margin-top: 14px; }
+.competition-join-fields { min-inline-size: 0; max-inline-size: 100%; }
 #competition-join label, .competition-arena-header p { font-weight: 700; }
 
 #competition-room, #competition-board-mode {
@@ -1482,15 +1489,21 @@ h1 {
     color: var(--text);
     border: 1px solid rgba(var(--accent-rgb), .55);
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--radius-control);
 }
 
-#competition-room { width: 12ch; text-transform: uppercase; }
+#competition-room {
+    inline-size: 10rem;
+    font: inherit;
+    text-transform: uppercase;
+}
+
+#competition-room::placeholder { text-transform: none; }
 
 .competition-leaderboards {
     margin-top: 16px;
     border: 1px solid rgba(var(--accent-rgb), .24);
-    border-radius: 13px;
+    border-radius: var(--radius-card);
 }
 
 .competition-leaderboards summary {
@@ -1513,10 +1526,10 @@ h1 {
     min-height: clamp(180px, 35vh, 340px);
     margin: 10px 0;
     border: 1px solid rgba(var(--accent-rgb), .27);
-    border-radius: 16px;
+    border-radius: var(--radius-card);
     background: linear-gradient(120deg, var(--area-1), var(--area-2));
     color: var(--text);
-    font-size: clamp(21px, 5vw, 50px);
+    font-size: var(--size-signal);
     font-weight: 900;
     touch-action: manipulation;
     cursor: pointer;
@@ -1606,7 +1619,7 @@ h1 {
     width: min(420px, calc(100% - 32px));
     padding: 24px;
     border: 1px solid rgba(var(--accent-rgb), .4);
-    border-radius: 16px;
+    border-radius: var(--radius-card);
     background: var(--panel);
     color: var(--text);
     box-shadow: 0 20px 60px #0006;
@@ -1712,7 +1725,7 @@ body.eclipse-signin {
 
 .eclipse-content h1 {
     margin: 0;
-    font: 900 clamp(3.6rem, 8.5vw, 8rem)/.83 system-ui, sans-serif;
+    font: 900 var(--size-score)/.83 system-ui, sans-serif;
     letter-spacing: -.075em;
 }
 
@@ -1725,7 +1738,7 @@ body.eclipse-signin {
     max-width: 29ch;
     margin: 22px 0 26px;
     color: var(--entry-muted);
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-size: var(--size-body);
     line-height: 1.55;
 }
 
@@ -1737,7 +1750,7 @@ body.eclipse-signin {
     min-height: 54px;
     padding: 12px 16px;
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--entry-accent);
     color: #231b14;
     font-weight: 800;
@@ -1754,7 +1767,7 @@ body.eclipse-signin {
     margin-top: 20px;
     max-width: 36ch;
     color: var(--entry-muted);
-    font-size: .92rem;
+    font-size: var(--size-body);
     line-height: 1.55;
 }
 
@@ -1781,7 +1794,7 @@ body.eclipse-signin {
     max-width: min(420px, 80vw);
     margin: 0;
     padding: 8px 12px;
-    border-radius: 9px;
+    border-radius: var(--radius-control);
     background: #1a2034;
     color: var(--entry-ink);
 }
@@ -1807,7 +1820,7 @@ body.eclipse-signin {
 .daily-badge-targets li, #daily-feedback {
     padding: 12px;
     border: 1px solid rgba(var(--accent-rgb), .35);
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     background: var(--panel);
 }
 .daily-badge-targets strong { display: block; color: var(--accent-soft); }
@@ -1827,10 +1840,10 @@ body.eclipse-signin {
     width: 2.25rem;
     height: 2.25rem;
     margin-inline-end: .55rem;
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
     border: 2px solid currentColor;
     vertical-align: middle;
-    font: 700 1.35rem/1 system-ui, sans-serif;
+    font: 700 var(--size-icon)/1 system-ui, sans-serif;
     background: #dcebe4;
     color: #174c3a;
 }

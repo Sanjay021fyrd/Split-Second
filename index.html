@@ -63,7 +63,7 @@
                 <span class="competition-icon" aria-hidden="true">&#9728;</span>
                 <span class="competition-card-title">Daily challenge</span>
                 <span class="competition-card-meta">3 rounds &middot; One attempt per day</span>
-                <span id="competition-daily-action" class="competition-card-action">Play today <span aria-hidden="true">&rarr;</span></span>
+                <span id="competition-daily-action" class="competition-card-action">View challenge</span>
             </button>
             <button id="competition-create" class="competition-card" type="button">
                 <span class="competition-icon" aria-hidden="true">&#8644;</span>
@@ -78,9 +78,9 @@
             <p>Play five rounds and record a valid reaction in each. Your score is the middle time when all five are sorted from fastest to slowest. You can replay, and only your fastest score counts toward the weekly leaderboard. The board resets Monday at 00:00 UTC.</p>
         </details>
         <form id="competition-join">
-            <label for="competition-room">Have a room code?</label>
+            <label for="competition-room">Room code</label>
             <div class="competition-join-fields">
-                <input id="competition-room" placeholder="8-character code" maxlength="8"
+                <input id="competition-room" placeholder="8 characters" maxlength="8"
                     minlength="8" pattern="[A-Fa-f0-9]{8}" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
                 <button class="auth-button" type="submit">Join duel</button>
             </div>

@@ -19,6 +19,7 @@
     let loading = false;
     let dailyCard = null;
     const dailyButton = element("competition-daily");
+    const dailyAction = element("competition-daily-action");
     let dailyStatusRequest = 0;
     let dailyPlayed = false;
     const dailyUsedDialog = element("daily-used-dialog");
@@ -61,7 +62,14 @@
             dailyPlayed = data.played;
             showHomeBadge(data.reward, data.resetsAt);
             dailyStart.disabled = false;
-            element("competition-daily-action").textContent = data.played ? "Attempt used" : "View challenge";
+            dailyButton.toggleAttribute("data-attempt-used", dailyPlayed);
+            dailyAction.textContent = dailyPlayed ? "Attempt used. Try again tomorrow." : "View challenge";
+            if (dailyPlayed) {
+                const check = document.createElement("span");
+                check.setAttribute("aria-hidden", "true");
+                check.textContent = "\u2713";
+                dailyAction.prepend(check);
+            }
             if (!dailyTargets.childElementCount) {
                 dailyTargets.replaceChildren(...data.rewards.map(({ name, target }) => {
                     const item = document.createElement("li");
@@ -344,7 +352,10 @@
 
     element("competition-practice").addEventListener("click", () => confirmRunExit(startGuest));
     element("competition-weekly").addEventListener("click", () => confirmRunExit(() => startOnline("create", { mode: "ranked" })));
-    dailyButton.addEventListener("click", () => confirmRunExit(openDailyIntro));
+    dailyButton.addEventListener("click", () => {
+        if (dailyPlayed) dailyUsedDialog.showModal();
+        else confirmRunExit(openDailyIntro);
+    });
     element("daily-intro-back").addEventListener("click", backFromDailyIntro);
     dailyStart.addEventListener("click", () => {
         if (dailyPlayed) dailyUsedDialog.showModal();
