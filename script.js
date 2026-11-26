@@ -45,7 +45,7 @@ const MODES = {
     },
     gonogo: {
         short: "Go/No-Go",
-        intro: "Green means GO. Purple means HOLD - don't touch it!",
+        intro: "Green means GO. Red means STOP. Don't click!",
         start: "START CHALLENGE",
         controls: "CLICK / TAP / SPACE",
         label: "GO / NO-GO COMPLETE"
@@ -751,7 +751,7 @@ function showDecoy() {
 
     setArea("decoy");
     setIcon("✋");
-    setMessage("HOLD!", "Decoy - do NOT click.");
+    setMessage("STOP!", "Decoy - do NOT click.");
     speedLabel.textContent = "HOLD STILL";
 
 

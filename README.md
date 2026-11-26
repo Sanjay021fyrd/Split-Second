@@ -14,7 +14,7 @@ Choose 3 or 5 rounds before starting. The default is 3. The theme and round coun
 | --- | --- |
 | **Classic** | Click, tap or press Space when the screen turns green. |
 | **Lights Out** | An F1-style race start. Five red lights come on one by one, hold for a random time, then all go out. That's your GO. Moving early is a "JUMP START". |
-| **Go / No-Go** | Like Classic, but a purple **HOLD!** decoy sometimes appears. Click it and it counts as a false start. |
+| **Go / No-Go** | Like Classic, but a red **STOP!** decoy sometimes appears. Click it and it counts as a false start. |
 | **2-Player Duel** | One screen, two players. Player 1 uses **Q** (or taps the left half), Player 2 uses **P** (or taps the right half). The player with more points after the selected rounds wins. Equal scores are a draw. |
 
 ## Practice and online competition
